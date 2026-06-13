@@ -126,6 +126,60 @@ build-mini-game-firmware.bat fast Pico
 The second argument can be another board directory name under `configs`.
 Firmware artifacts are written under `build`.
 
+### Find the built firmware
+
+When the build succeeds, the final lines printed by the batch file include the
+absolute path beginning with `Firmware:`. The general output location is:
+
+```text
+<repository>\build\GP2040-CE_<version>_<board>.uf2
+```
+
+For this checkout's default Pico build, the current file is:
+
+```text
+E:\GP2040\build\GP2040-CE_0.0.0_Pico.uf2
+```
+
+The `0.0.0` version is normal for a local development build that is not based on a
+release tag. It does not mean the build failed.
+
+Build with the configuration for the actual controller board whenever one exists:
+
+```bat
+build-mini-game-firmware.bat full <BoardConfig>
+```
+
+The board configuration names are the directory names under `configs`. A generic
+`Pico` UF2 may use the wrong pins or peripherals for a custom controller board.
+
+### Install the UF2 on the controller
+
+Back up the controller configuration from the Web Configurator before flashing,
+especially when changing board configurations or testing development firmware.
+
+1. Disconnect the controller from USB.
+2. Hold the physical `BOOTSEL` button on the RP2040 controller board.
+3. Connect the controller to the PC while continuing to hold `BOOTSEL`.
+4. Release the button when Windows mounts a drive named `RPI-RP2`.
+5. Copy the matching `.uf2` file from the `build` directory to the root of `RPI-RP2`.
+6. Wait for the copy to finish. The drive disappears and the controller restarts automatically.
+
+Do not disconnect the controller while Windows is copying the UF2.
+
+If the existing GP2040-CE Web Configurator is available, its reboot menu provides
+another route into the bootloader:
+
+1. Open the Web Configurator for the connected controller.
+2. Open the reboot menu and select `USB (BOOTSEL)`.
+3. Wait for the `RPI-RP2` drive to appear.
+4. Copy the matching UF2 to that drive and wait for the controller to restart.
+
+After the new firmware boots, open the Web Configurator's `Mini Games` page, enable
+the add-on and desired games, select the boot-entry button, save, and reboot. Hold
+that configured button while powering on or rebooting to let the mini-game add-on
+take ownership of the display.
+
 ### Initialize dependencies
 
 ```powershell
@@ -158,9 +212,6 @@ For the `Pico` board, the resulting firmware is:
 ```text
 build/GP2040-CE_<version>_Pico.uf2
 ```
-
-To install it, hold BOOTSEL while connecting the RP2040 board and copy the UF2
-to the mounted `RPI-RP2` drive.
 
 ### Faster firmware-only rebuild
 

@@ -57,7 +57,20 @@ if errorlevel 1 goto failed
 
 echo.
 echo Firmware build completed.
-for %%F in ("build\GP2040-CE_*_%BOARD%.uf2") do echo UF2: %%~fF
+set "UF2_FILE="
+for %%F in ("build\GP2040-CE_*_%BOARD%.uf2") do if exist "%%~fF" set "UF2_FILE=%%~fF"
+if not defined UF2_FILE goto missing_output
+
+echo Firmware: %UF2_FILE%
+echo.
+echo Install on the controller:
+echo   1. Disconnect the controller from USB.
+echo   2. Hold the controller board's BOOTSEL button.
+echo   3. Connect USB, then release BOOTSEL when the RPI-RP2 drive appears.
+echo   4. Copy the UF2 file shown above to the RPI-RP2 drive.
+echo   5. Wait for the drive to disappear and the controller to restart.
+echo.
+echo Web Configurator alternative: choose Reboot ^> USB (BOOTSEL), then copy the UF2.
 popd
 exit /b 0
 
@@ -90,6 +103,10 @@ goto failed
 :missing_web
 echo Fast mode requires lib\httpd\fsdata.c from a previous full build.
 echo Run "%~nx0 full %BOARD%" first.
+goto failed
+
+:missing_output
+echo Build completed, but no UF2 matching board "%BOARD%" was found under "%REPO_ROOT%\build".
 goto failed
 
 :failed

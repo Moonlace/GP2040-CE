@@ -15,6 +15,7 @@ const BOOT_MODES = {
 	GAMEPAD: 0,
 	WEBCONFIG: 1,
 	BOOTSEL: 2,
+	MINIGAME: 3,
 };
 
 const Navigation = () => {
@@ -115,6 +116,13 @@ const Navigation = () => {
 						<NavDropdown.Item as={NavLink} eventKey={eventKey++} to="/macro">
 							{t('Navigation:macro-label')}
 						</NavDropdown.Item>
+						<NavDropdown.Item
+							as={NavLink}
+							eventKey={eventKey++}
+							to="/mini-games"
+						>
+							{t('Navigation:mini-games-label')}
+						</NavDropdown.Item>
 						<NavDropdown.Item as={NavLink} eventKey={eventKey++} to="/backup">
 							{t('Navigation:backup-label')}
 						</NavDropdown.Item>
@@ -192,6 +200,16 @@ const Navigation = () => {
 					>
 						{isRebooting !== BOOT_MODES.WEBCONFIG
 							? t('Navigation:reboot-modal-button-web-config-label')
+							: isRebooting
+								? t('Navigation:reboot-modal-button-progress-label')
+								: t('Navigation:reboot-modal-button-success-label')}
+					</Button>
+					<Button
+						variant="info"
+						onClick={() => handleReboot(BOOT_MODES.MINIGAME)}
+					>
+						{isRebooting !== BOOT_MODES.MINIGAME
+							? t('Navigation:reboot-modal-button-mini-games-label')
 							: isRebooting
 								? t('Navigation:reboot-modal-button-progress-label')
 								: t('Navigation:reboot-modal-button-success-label')}

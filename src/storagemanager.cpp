@@ -151,7 +151,11 @@ void Storage::setBootModeFunctionalPinMappings()
 	// Relying on the assumption that all profiles share same set of RESERVED/ASSIGNED_TO_ADDON pins
 	GpioMappingInfo* pins = getGpioMappings().pins;
 
-	int32_t mask = bootModeOptions.webConfigPinMask | bootModeOptions.usbModePinMask;
+	Mask_t mask = bootModeOptions.webConfigPinMask |
+		bootModeOptions.usbModePinMask;
+	if (bootModeOptions.miniGamePinMask != static_cast<uint32_t>(-1)) {
+		mask |= bootModeOptions.miniGamePinMask;
+	}
 	for (size_t i = 0; i < bootModeOptions.inputModeMappings_count; i++) {
 		auto mapping = bootModeOptions.inputModeMappings[i];
 		if (mapping.pinMask == -1) {

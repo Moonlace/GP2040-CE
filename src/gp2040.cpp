@@ -139,11 +139,15 @@ void GP2040::setup() {
 		return;
 	}
 
+	System::setMiniGameMode(bootAction.type == BootActionType::ENTER_MINIGAME_MODE);
+
 	InputMode inputMode = bootAction.inputMode;
 	uint32_t profile = bootAction.profileNumber;
 
 	// Setup USB Driver
-	DriverManager::getInstance().setup(inputMode);
+	if (!System::isMiniGameMode()) {
+		DriverManager::getInstance().setup(inputMode);
+	}
 
 	if (inputMode != INPUT_MODE_CONFIG) {
 		bool inputModeChanged = inputMode != gamepadOptions.inputMode;
@@ -233,19 +237,22 @@ void GP2040::debounceGpioGetAll() {
 
 void GP2040::run() {
 	bool configMode = DriverManager::getInstance().isConfigMode();
+	bool miniGameMode = System::isMiniGameMode();
 	GPDriver * inputDriver = DriverManager::getInstance().getDriver();
 	Gamepad * gamepad = Storage::getInstance().GetGamepad();
 	Gamepad * processedGamepad = Storage::getInstance().GetProcessedGamepad();
 	GamepadState prevState;
 
-	// Start the TinyUSB Device functionality
-	tud_init(TUD_OPT_RHPORT);
+	if (!miniGameMode) {
+		// Start the TinyUSB Device functionality
+		tud_init(TUD_OPT_RHPORT);
 
-	// Initialize our USB manager
-	USBHostManager::getInstance().start();
+		// Initialize our USB manager
+		USBHostManager::getInstance().start();
 
-	if (configMode == true ) {
-		rndis_init(WEB_CONFIG_HOSTNAME);
+		if (configMode == true ) {
+			rndis_init(WEB_CONFIG_HOSTNAME);
+		}
 	}
 
 	while (1) { // LOOP
@@ -259,6 +266,16 @@ void GP2040::run() {
 		gamepad->read();
 
 		checkRawState(prevState, gamepad->state);
+
+		if (miniGameMode) {
+			gamepad->process();
+			memcpy(&processedGamepad->state, &gamepad->state, sizeof(GamepadState));
+
+			if (!System::isMiniGameDisplayReady() || System::takeMiniGameExitRequest()) {
+				System::reboot(System::BootMode::GAMEPAD);
+			}
+			continue;
+		}
 
 		// Process USB Host on Core0
 		USBHostManager::getInstance().process();
@@ -356,6 +373,9 @@ GP2040::BootAction GP2040::getButtonMappedBootAction() {
 		case System::BootMode::USB:
 			bootAction.type = BootActionType::ENTER_USB_MODE;
 			return bootAction;
+		case System::BootMode::MINIGAME:
+			bootAction.type = BootActionType::ENTER_MINIGAME_MODE;
+			return bootAction;
 		case System::BootMode::DEFAULT:
 			break;
 	}
@@ -438,6 +458,9 @@ GP2040::BootAction GP2040::getGpioMappedBootAction() {
 		case System::BootMode::USB:
 			action.type = BootActionType::ENTER_USB_MODE;
 			return action;
+		case System::BootMode::MINIGAME:
+			action.type = BootActionType::ENTER_MINIGAME_MODE;
+			return action;
 		default:
 			break;
 	}
@@ -450,6 +473,12 @@ GP2040::BootAction GP2040::getGpioMappedBootAction() {
 
 	if (gpio == bootModeOptions.webConfigPinMask) {
 		action.inputMode = InputMode::INPUT_MODE_CONFIG;
+		return action;
+	}
+
+	if (bootModeOptions.miniGamePinMask != static_cast<uint32_t>(-1) &&
+		gpio == bootModeOptions.miniGamePinMask) {
+		action.type = BootActionType::ENTER_MINIGAME_MODE;
 		return action;
 	}
 

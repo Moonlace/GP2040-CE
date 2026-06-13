@@ -16,5 +16,6 @@ export default {
 	'api-profiles-text': 'Profile Mappings',
 	'api-addons-text': 'Add-Ons',
 	'api-heTrigger-text': 'Hall Effect Trigger',
+	'api-miniGames-text': 'Mini Games',
 	'api-splash-text': 'Splash Image',
 };

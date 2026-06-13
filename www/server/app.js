@@ -932,6 +932,7 @@ app.get('/api/getBootModeOptions', (req, res) => {
 		enabled: false,
 		webConfigPinMask: 1,
 		usbModePinMask: 14,
+		miniGamePinMask: 16,
 		inputModeMappings: [
 			{
 				pinMask: 2,
@@ -943,6 +944,23 @@ app.get('/api/getBootModeOptions', (req, res) => {
 				inputMode: 3,
 				profileNumber: 0,
 			}
+		],
+	});
+});
+
+app.get('/api/getMiniGameOptions', (req, res) => {
+	return res.send({
+		enabled: true,
+		defaultGameId: 1,
+		rhythmBpm: 120,
+		rhythmDifficulty: 2,
+		games: [
+			{
+				gameId: 1,
+				enabled: true,
+				order: 0,
+				name: 'Rhythm Rush',
+			},
 		],
 	});
 });

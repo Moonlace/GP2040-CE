@@ -280,6 +280,7 @@ src/addons/keyboard_host_listener.cpp
 src/addons/i2canalog1219.cpp
 src/addons/i2c_gpio_pcf8575.cpp
 src/addons/display.cpp
+src/addons/mini_game.cpp
 src/addons/neopicoleds.cpp
 src/addons/playerleds.cpp
 src/addons/reactiveleds.cpp
@@ -296,6 +297,7 @@ src/addons/spi_analog_ads1256.cpp
 src/addons/gamepad_usb_host.cpp
 src/addons/gamepad_usb_host_listener.cpp
 src/addons/tg16_input.cpp
+src/minigames/rhythm_game.cpp
 src/animationstation/animation.cpp
 src/animationstation/animationstation.cpp
 src/animationstation/effects/chase.cpp
@@ -357,6 +359,7 @@ headers/display/ui/elements
 headers/display/ui/screens
 headers/animationstation
 headers/animationstation/effects
+headers/minigames
 configs/${GP2040_BOARDCONFIG}
 ${PROTO_OUTPUT_DIR}
 ${CMAKE_BINARY_DIR}/headers

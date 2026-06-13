@@ -49,6 +49,7 @@ private:
 
     enum class BootActionType {
 			ENTER_USB_MODE,
+            ENTER_MINIGAME_MODE,
 			SET_INPUT_MODE
 		};
 

@@ -31,6 +31,7 @@
 #include "addons/wiiext.h"
 #include "addons/snes_input.h"
 #include "addons/input_macro.h"
+#include "addons/mini_game.h"
 #include "addons/rotaryencoder.h"
 #include "addons/i2c_gpio_pcf8575.h"
 #include "addons/drv8833_rumble.h"
@@ -321,6 +322,9 @@ void ConfigUtils::initUnsetPropertiesWithDefaults(Config& config)
     INIT_UNSET_PROPERTY(config.gamepadOptions, usbVendorID, DEFAULT_USB_VENDOR_ID);
     INIT_UNSET_PROPERTY(config.gamepadOptions, usbProductID, DEFAULT_USB_PRODUCT_ID);
     INIT_UNSET_PROPERTY(config.gamepadOptions, miniMenuGamepadInput, MINI_MENU_GAMEPAD_INPUT);
+
+    // bootModeOptions
+    INIT_UNSET_PROPERTY(config.bootModeOptions, miniGamePinMask, static_cast<uint32_t>(-1));
 
     // hotkeyOptions
     HotkeyOptions& hotkeyOptions = config.hotkeyOptions;
@@ -1158,6 +1162,19 @@ void ConfigUtils::initUnsetPropertiesWithDefaults(Config& config)
     INIT_UNSET_PROPERTY(config.addonOptions.tg16Options, dataPin1, TG16_PAD_DATA_PIN1);
     INIT_UNSET_PROPERTY(config.addonOptions.tg16Options, dataPin2, TG16_PAD_DATA_PIN2);
     INIT_UNSET_PROPERTY(config.addonOptions.tg16Options, dataPin3, TG16_PAD_DATA_PIN3);
+
+    // addonOptions.miniGameOptions
+    MiniGameOptions& miniGameOptions = config.addonOptions.miniGameOptions;
+    INIT_UNSET_PROPERTY(miniGameOptions, enabled, !!MINI_GAME_ADDON_ENABLED);
+    INIT_UNSET_PROPERTY(miniGameOptions, defaultGameId, MINI_GAME_RHYTHM_ID);
+    INIT_UNSET_PROPERTY(miniGameOptions, rhythmBpm, MINI_GAME_RHYTHM_BPM);
+    INIT_UNSET_PROPERTY(miniGameOptions, rhythmDifficulty, MINI_GAME_RHYTHM_DIFFICULTY);
+    if (miniGameOptions.games_count == 0) {
+        INIT_UNSET_PROPERTY(miniGameOptions.games[0], gameId, MINI_GAME_RHYTHM_ID);
+        INIT_UNSET_PROPERTY(miniGameOptions.games[0], enabled, true);
+        INIT_UNSET_PROPERTY(miniGameOptions.games[0], order, 0);
+        miniGameOptions.games_count = 1;
+    }
 }
 
 

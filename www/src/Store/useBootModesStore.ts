@@ -44,6 +44,7 @@ type Actions = {
 type APIResponseData = {
 	webConfigPinMask: number;
 	usbModePinMask: number;
+	miniGamePinMask: number;
 	enabled: boolean;
 	inputModeMappings: {
 		pinMask: number;
@@ -55,7 +56,7 @@ type APIResponseData = {
 
 function maskToSet(mask: number) {
 	let s = new Set<number>();
-	if (mask === -1) {
+	if (mask === -1 || mask === 0xffffffff) {
 		return s;
 	}
 	for (let i = 0; i < NUM_PINS; i++) {
@@ -99,6 +100,11 @@ const INITIAL_STATE = {
 			profileIndex: undefined,
 		},
 		webConfig: {
+			pins: new Set<number>(),
+			inputMode: undefined,
+			profileIndex: undefined,
+		},
+		miniGame: {
 			pins: new Set<number>(),
 			inputMode: undefined,
 			profileIndex: undefined,
@@ -155,7 +161,13 @@ export const useBootModeStore = create<State & { actions: Actions }>()((set, get
 				return;
 			}
 
-			let { enabled, webConfigPinMask, usbModePinMask, inputModeMappings } = response;
+			const {
+				enabled,
+				webConfigPinMask,
+				usbModePinMask,
+				miniGamePinMask,
+				inputModeMappings,
+			} = response;
 
 			let inputModes: { [key: string]: BootModeMapping } = {};
 			for (const m of inputModeMappings) {
@@ -184,6 +196,11 @@ export const useBootModeStore = create<State & { actions: Actions }>()((set, get
 						inputMode: undefined,
 						profileIndex: undefined,
 					},
+					miniGame: {
+						pins: maskToSet(miniGamePinMask),
+						inputMode: undefined,
+						profileIndex: undefined,
+					},
 					...inputModes,
 				},
 			}));
@@ -195,6 +212,7 @@ export const useBootModeStore = create<State & { actions: Actions }>()((set, get
 			const postData: APIResponseData = {
 				webConfigPinMask: setToMask(bootModes['webConfig'].pins),
 				usbModePinMask: setToMask(bootModes['usbMode'].pins),
+				miniGamePinMask: setToMask(bootModes['miniGame'].pins),
 				enabled: enabled,
 				inputModeMappings: Object.entries(bootModes)
 					.filter(([k, _v], _i) => k.startsWith('inputMode-'))

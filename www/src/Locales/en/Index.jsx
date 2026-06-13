@@ -21,6 +21,7 @@ import InputMacroAddon from './InputMacroAddon';
 import LayoutConfig from './LayoutConfig';
 import Proto from './Proto/Index';
 import BootModeMapping from './BootModeMapping';
+import MiniGames from './MiniGames';
 
 export default {
 	Common,
@@ -45,5 +46,6 @@ export default {
 	ReactiveLED,
 	Proto,
 	HETrigger,
-	BootModeMapping
+	BootModeMapping,
+	MiniGames,
 };

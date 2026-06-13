@@ -15,6 +15,7 @@
 #include "version.h"
 
 #include <cstring>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <memory>
@@ -44,7 +45,7 @@
 
 extern struct fsdata_file file__index_html[];
 
-const static char* spaPaths[] = { "/backup", "/display-config", "/led-config", "/pin-mapping", "/settings", "/reset-settings", "/add-ons", "/custom-theme", "/macro", "/peripheral-mapping", "/boot-mode-mapping" };
+const static char* spaPaths[] = { "/backup", "/display-config", "/led-config", "/pin-mapping", "/settings", "/reset-settings", "/add-ons", "/custom-theme", "/macro", "/peripheral-mapping", "/boot-mode-mapping", "/mini-games" };
 const static char* excludePaths[] = { "/css", "/images", "/js", "/static" };
 const static uint32_t rebootDelayMs = 500;
 static string http_post_uri;
@@ -1206,6 +1207,7 @@ std::string getBootModeOptions() {
 	writeDoc(doc, "enabled", bootModeOptions.enabled);
 	writeDoc(doc, "webConfigPinMask", bootModeOptions.webConfigPinMask);
 	writeDoc(doc, "usbModePinMask", bootModeOptions.usbModePinMask);
+	writeDoc(doc, "miniGamePinMask", static_cast<int32_t>(bootModeOptions.miniGamePinMask));
 
 	if (bootModeOptions.inputModeMappings_count == 0) {
         doc.createNestedArray("inputModeMappings");
@@ -1228,6 +1230,7 @@ std::string setBootModeOptions() {
 	bootModeOptions.enabled = options["enabled"].as<bool>();
 	bootModeOptions.webConfigPinMask = options["webConfigPinMask"].as<int32_t>();
 	bootModeOptions.usbModePinMask = options["usbModePinMask"].as<int32_t>();
+	bootModeOptions.miniGamePinMask = options["miniGamePinMask"].as<int32_t>();
 
     JsonArray mappings = options["inputModeMappings"];
 
@@ -1244,6 +1247,54 @@ std::string setBootModeOptions() {
 
 	EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(true));
 	return serialize_json(doc);
+}
+
+std::string getMiniGameOptions() {
+	const size_t capacity = JSON_OBJECT_SIZE(8) + JSON_ARRAY_SIZE(8) + (JSON_OBJECT_SIZE(4) * 8);
+	DynamicJsonDocument doc(capacity);
+	MiniGameOptions& options = Storage::getInstance().getMiniGameOptions();
+
+	writeDoc(doc, "enabled", options.enabled);
+	writeDoc(doc, "defaultGameId", options.defaultGameId);
+	writeDoc(doc, "rhythmBpm", options.rhythmBpm);
+	writeDoc(doc, "rhythmDifficulty", options.rhythmDifficulty);
+
+	JsonArray games = doc.createNestedArray("games");
+	for (size_t i = 0; i < options.games_count; i++) {
+		JsonObject game = games.createNestedObject();
+		game["gameId"] = options.games[i].gameId;
+		game["enabled"] = options.games[i].enabled;
+		game["order"] = options.games[i].order;
+		game["name"] = options.games[i].gameId == 1 ? "Rhythm Rush" : "Unknown";
+	}
+
+	return serialize_json(doc);
+}
+
+std::string setMiniGameOptions() {
+	DynamicJsonDocument doc = get_post_data();
+	JsonObject request = doc.as<JsonObject>();
+	MiniGameOptions& options = Storage::getInstance().getMiniGameOptions();
+
+	options.enabled = request["enabled"].as<bool>();
+	options.defaultGameId = request["defaultGameId"].as<uint32_t>();
+	options.rhythmBpm = std::max<uint32_t>(60, std::min<uint32_t>(240, request["rhythmBpm"].as<uint32_t>()));
+	options.rhythmDifficulty = std::max<uint32_t>(1, std::min<uint32_t>(3, request["rhythmDifficulty"].as<uint32_t>()));
+
+	JsonArray games = request["games"];
+	size_t i = 0;
+	for (JsonObject game : games) {
+		options.games[i].gameId = game["gameId"].as<uint32_t>();
+		options.games[i].enabled = game["enabled"].as<bool>();
+		options.games[i].order = game["order"].as<uint32_t>();
+		if (++i >= 8) {
+			break;
+		}
+	}
+	options.games_count = i;
+
+	EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(true));
+	return getMiniGameOptions();
 }
 
 std::string setKeyMappings()
@@ -2621,6 +2672,7 @@ enum BOOT_MODES {
 	GAMEPAD = 0,
 	WEBCONFIG = 1,
 	BOOTSEL = 2,
+	MINIGAME = 3,
 };
 
 std::string reboot() {
@@ -2633,6 +2685,8 @@ std::string reboot() {
         systemBootMode = System::BootMode::WEBCONFIG;
     } else if (bootMode == BOOT_MODES::BOOTSEL ) {
         systemBootMode = System::BootMode::USB;
+    } else if (bootMode == BOOT_MODES::MINIGAME ) {
+        systemBootMode = System::BootMode::MINIGAME;
     }
     EventManager::getInstance().triggerEvent(new GPRestartEvent((System::BootMode)systemBootMode));
     doc["success"] = true;
@@ -2779,6 +2833,8 @@ static const std::pair<const char*, HandlerFuncPtr> handlerFuncs[] =
     { "/api/getJoystickCenter2", getJoystickCenter2 },
 		{ "/api/getBootModeOptions", getBootModeOptions },
 		{ "/api/setBootModeOptions", setBootModeOptions },
+		{ "/api/getMiniGameOptions", getMiniGameOptions },
+		{ "/api/setMiniGameOptions", setMiniGameOptions },
 #if !defined(NDEBUG)
     { "/api/echo", echo },
 #endif

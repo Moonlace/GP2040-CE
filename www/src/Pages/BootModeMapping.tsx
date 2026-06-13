@@ -263,7 +263,7 @@ function FixedBootModeRow({
 	mappingKey,
 }: {
 	label: string;
-	mappingKey: 'usbMode' | 'webConfig';
+	mappingKey: 'usbMode' | 'webConfig' | 'miniGame';
 }) {
 	return (
 		<FormRow
@@ -367,6 +367,10 @@ export default function BootModeMappingPage() {
 							<FixedBootModeRow
 								label={t('Navigation:reboot-modal-button-bootsel-label')}
 								mappingKey="usbMode"
+							/>
+							<FixedBootModeRow
+								label={t('Navigation:reboot-modal-button-mini-games-label')}
+								mappingKey="miniGame"
 							/>
 							{inputModeKeys.map((k, _) => (
 								<BootModeRow mappingKey={k} key={k} />

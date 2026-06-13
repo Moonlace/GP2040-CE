@@ -19,6 +19,7 @@ import InputMacroAddonPage from './Pages/InputMacroAddonPage';
 
 import './App.scss';
 import BootModeMappingPage from './Pages/BootModeMapping';
+import MiniGamesPage from './Pages/MiniGamesPage';
 
 const App = () => {
 	return (
@@ -43,6 +44,7 @@ const App = () => {
 						<Route path="/backup" element={<BackupPage />} />
 						<Route path="/playground" element={<PlaygroundPage />} />
 						<Route path="/macro" element={<InputMacroAddonPage />} />
+						<Route path="/mini-games" element={<MiniGamesPage />} />
 					</Routes>
 				</div>
 			</Router>

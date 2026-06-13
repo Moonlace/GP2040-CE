@@ -26,6 +26,10 @@ void RestartScreen::drawScreen() {
             getRenderer()->drawText(2, 6, "Booting WebConfig");
             getRenderer()->drawText(4, 7, "Please Wait");
             break;
+        case System::BootMode::MINIGAME:
+            getRenderer()->drawText(3, 6, "Mini Game Mode");
+            getRenderer()->drawText(4, 7, "Please Wait");
+            break;
         case System::BootMode::GAMEPAD:
         case System::BootMode::DEFAULT:
             getRenderer()->drawText(4, 6, "Gamepad Mode");

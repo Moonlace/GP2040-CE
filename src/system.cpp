@@ -8,6 +8,11 @@
 #include <pico/multicore.h>
 
 #include <malloc.h>
+#include <atomic>
+
+static std::atomic<bool> miniGameMode(false);
+static std::atomic<bool> miniGameDisplayReady(false);
+static std::atomic<bool> miniGameExitRequested(false);
 
 extern char __flash_binary_start;
 extern char __flash_binary_end;
@@ -82,7 +87,8 @@ System::BootMode System::takeBootMode() {
     }
 
     BootMode bootMode = static_cast<BootMode>(watchdog_hw->scratch[5]);
-    if (bootMode != BootMode::GAMEPAD && bootMode != BootMode::WEBCONFIG && bootMode != BootMode::USB) {
+    if (bootMode != BootMode::GAMEPAD && bootMode != BootMode::WEBCONFIG &&
+        bootMode != BootMode::USB && bootMode != BootMode::MINIGAME) {
         bootMode = BootMode::DEFAULT;
     }
 
@@ -91,4 +97,30 @@ System::BootMode System::takeBootMode() {
     watchdog_hw->scratch[5] = static_cast<uint32_t>(BootMode::DEFAULT);
 
     return bootMode;
+}
+
+void System::setMiniGameMode(bool enabled) {
+    miniGameMode.store(enabled);
+    miniGameDisplayReady.store(false);
+    miniGameExitRequested.store(false);
+}
+
+bool System::isMiniGameMode() {
+    return miniGameMode.load();
+}
+
+void System::setMiniGameDisplayReady(bool ready) {
+    miniGameDisplayReady.store(ready);
+}
+
+bool System::isMiniGameDisplayReady() {
+    return miniGameDisplayReady.load();
+}
+
+void System::requestMiniGameExit() {
+    miniGameExitRequested.store(true);
+}
+
+bool System::takeMiniGameExitRequest() {
+    return miniGameExitRequested.exchange(false);
 }

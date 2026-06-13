@@ -46,6 +46,7 @@ public:
 	GpioMappingInfo* getProfilePinMappings() { return functionalPinMappings; }
 	PeripheralOptions& getPeripheralOptions() { return config.peripheralOptions; }
 	BootModeOptions& getBootModeOptions() { return config.bootModeOptions; }
+	MiniGameOptions& getMiniGameOptions() { return config.addonOptions.miniGameOptions; }
 
 	void init();
 	bool save();

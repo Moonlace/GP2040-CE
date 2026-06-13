@@ -48,6 +48,9 @@ self-test commands. The simulator also includes a visual autoplay bot that
 detects notes from the framebuffer and validates perfect-play results across a
 tempo, difficulty, and display-size matrix.
 
+For complete firmware, simulator, and bot build instructions, see
+`docs/mini-game-build-and-test-guide.md`.
+
 ## Rhythm Rush
 
 Rhythm Rush is the initial built-in game. Notes move down four lanes and map to

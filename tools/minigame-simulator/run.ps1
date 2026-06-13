@@ -1,5 +1,6 @@
 param(
 	[switch]$Test,
+	[switch]$BuildOnly,
 	[switch]$Bot,
 	[switch]$BotMatrix,
 	[ValidateRange(60, 240)]
@@ -77,6 +78,11 @@ if ($LASTEXITCODE -ne 0) {
 & $cmake --build $buildDirectory --parallel
 if ($LASTEXITCODE -ne 0) {
 	exit $LASTEXITCODE
+}
+
+if ($BuildOnly) {
+	Write-Host "PC mini-game simulator built: $executable"
+	exit 0
 }
 
 if ($Test) {

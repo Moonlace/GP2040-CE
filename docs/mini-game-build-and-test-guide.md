@@ -10,6 +10,21 @@ Run all commands from the repository root unless a section says otherwise.
 The Windows examples assume the toolchain is installed under
 `%USERPROFILE%\.pico-sdk`.
 
+## Windows Batch Files
+
+Three batch files at the repository root provide the shortest path for the
+main workflows:
+
+```text
+build-mini-game-firmware.bat
+build-run-mini-game-bot.bat
+build-run-mini-game-pc.bat
+```
+
+They can be launched from Command Prompt or PowerShell. Each script changes to
+the repository root automatically, so it also works when launched by
+double-clicking or from another directory.
+
 ## Prerequisites
 
 Firmware builds require:
@@ -86,6 +101,31 @@ src/minigames/rhythm_game.cpp
 
 ## Build Firmware
 
+### Batch file
+
+Build Pico firmware, including all registered mini-game add-ons and games:
+
+```bat
+build-mini-game-firmware.bat
+```
+
+The default is a full `Pico` build. A full build updates submodules, rebuilds
+the Web Configurator, embeds it, and compiles the firmware:
+
+```bat
+build-mini-game-firmware.bat full Pico
+```
+
+After at least one successful full build, use fast mode to reuse the existing
+embedded Web Configurator:
+
+```bat
+build-mini-game-firmware.bat fast Pico
+```
+
+The second argument can be another board directory name under `configs`.
+Firmware artifacts are written under `build`.
+
 ### Initialize dependencies
 
 ```powershell
@@ -151,6 +191,33 @@ build.
 The simulator compiles the production `src/minigames/rhythm_game.cpp` file
 unchanged against host-only display, input, clock, and configuration adapters.
 
+### Batch file
+
+Build and launch with default tuning:
+
+```bat
+build-run-mini-game-pc.bat
+```
+
+Tune the rhythm game with positional arguments for BPM, difficulty, and display
+height:
+
+```bat
+build-run-mini-game-pc.bat 180 3 64
+```
+
+Build without launching the interactive game:
+
+```bat
+build-run-mini-game-pc.bat build
+```
+
+Build and run all PC tests:
+
+```bat
+build-run-mini-game-pc.bat test
+```
+
 Build and launch:
 
 ```powershell
@@ -192,6 +259,33 @@ cmake --build tools/minigame-simulator/build --parallel
 The autoplay bot tests through the simulated OLED framebuffer and public game
 inputs. It detects notes reaching the rendered hit line and emits B1 through
 B4. It does not read the game's private note array.
+
+### Batch file
+
+Build the bot and run the complete matrix:
+
+```bat
+build-run-mini-game-bot.bat
+```
+
+The following is equivalent and sets each matrix case to 60 simulated seconds:
+
+```bat
+build-run-mini-game-bot.bat matrix 60
+```
+
+Run one tuned bot configuration. Arguments are BPM, difficulty, display
+height, and duration in seconds:
+
+```bat
+build-run-mini-game-bot.bat single 180 3 64 20
+```
+
+Build the simulator and run all CTest cases:
+
+```bat
+build-run-mini-game-bot.bat test
+```
 
 ### Run one configuration
 

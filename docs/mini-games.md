@@ -36,6 +36,16 @@ To add another game:
 Games should use fixed-size storage, avoid allocations in `update` and
 `render`, and support both 128x64 and 128x32 display heights where practical.
 
+## Desktop testing
+
+The standalone project in `tools/minigame-simulator` compiles the production
+rhythm-game source against host-only display, input, clock, and configuration
+stand-ins. It is not referenced by the firmware CMake project, so desktop
+dependencies cannot enter Pico builds.
+
+See `tools/minigame-simulator/README.md` for build, interactive controls, and
+self-test commands.
+
 ## Rhythm Rush
 
 Rhythm Rush is the initial built-in game. Notes move down four lanes and map to

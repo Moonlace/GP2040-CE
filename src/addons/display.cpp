@@ -7,6 +7,7 @@
 #include "GamepadState.h"
 #include "enums.h"
 #include "storagemanager.h"
+#include "system.h"
 #include "pico/stdlib.h"
 
 #include "drivermanager.h"
@@ -16,6 +17,10 @@
 #include "class/hid/hid.h"
 
 bool DisplayAddon::available() {
+    if (System::isMiniGameMode()) {
+        return false;
+    }
+
     const DisplayOptions& options = Storage::getInstance().getDisplayOptions();
     bool result = false;
 

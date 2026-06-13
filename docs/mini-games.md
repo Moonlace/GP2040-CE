@@ -53,6 +53,8 @@ For complete firmware, simulator, and bot build instructions, see
 
 ## Rhythm Rush
 
-Rhythm Rush is the initial built-in game. Notes move down four lanes and map to
-B1, B2, B3, and B4 from left to right. The configurator controls tempo from 60
-to 240 BPM and provides three timing-window difficulty levels.
+Rhythm Rush is the initial built-in game. Notes move down four lanes. Each lane
+can be assigned to any gamepad button or direction in the Mini Games
+configurator; the defaults are B1, B2, B3, and B4 from left to right. The
+configurator also controls tempo from 60 to 240 BPM and provides three
+timing-window difficulty levels.

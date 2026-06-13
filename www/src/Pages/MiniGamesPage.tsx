@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import Section from '../Components/Section';
+import { AppContext } from '../Contexts/AppContext';
+import { BUTTONS, BUTTON_MASKS_OPTIONS } from '../Data/Buttons';
 import WebApi from '../Services/WebApi';
 
 type GameEntry = {
@@ -18,6 +20,10 @@ type MiniGameOptions = {
 	defaultGameId: number;
 	rhythmBpm: number;
 	rhythmDifficulty: number;
+	rhythmLane1Button: number;
+	rhythmLane2Button: number;
+	rhythmLane3Button: number;
+	rhythmLane4Button: number;
 	games: GameEntry[];
 };
 
@@ -26,11 +32,16 @@ const DEFAULT_OPTIONS: MiniGameOptions = {
 	defaultGameId: 1,
 	rhythmBpm: 120,
 	rhythmDifficulty: 2,
+	rhythmLane1Button: 1 << 0,
+	rhythmLane2Button: 1 << 1,
+	rhythmLane3Button: 1 << 2,
+	rhythmLane4Button: 1 << 3,
 	games: [{ gameId: 1, enabled: true, order: 0, name: 'Rhythm Rush' }],
 };
 
 export default function MiniGamesPage() {
 	const { t } = useTranslation('');
+	const { buttonLabels } = useContext(AppContext);
 	const [options, setOptions] = useState<MiniGameOptions>(DEFAULT_OPTIONS);
 	const [loading, setLoading] = useState(true);
 	const [message, setMessage] = useState('');
@@ -69,6 +80,24 @@ export default function MiniGamesPage() {
 	}
 
 	const enabledGames = options.games.filter((game) => game.enabled);
+	const buttonLabelType = buttonLabels.buttonLabelType;
+	const laneButtonOptions = BUTTON_MASKS_OPTIONS.filter(
+		(button) => button.value !== 0,
+	).map((button) => ({
+		...button,
+		value: button.value >>> 0,
+	}));
+	const laneKeys: Array<
+		| 'rhythmLane1Button'
+		| 'rhythmLane2Button'
+		| 'rhythmLane3Button'
+		| 'rhythmLane4Button'
+	> = [
+		'rhythmLane1Button',
+		'rhythmLane2Button',
+		'rhythmLane3Button',
+		'rhythmLane4Button',
+	];
 
 	return (
 		<>
@@ -168,6 +197,37 @@ export default function MiniGamesPage() {
 						</Form.Select>
 					</Col>
 				</Form.Group>
+				<Form.Label className="mt-3">
+					{t('MiniGames:lane-buttons-label')}
+				</Form.Label>
+				{laneKeys.map((laneKey, index) => (
+					<Form.Group
+						as={Row}
+						className="mb-2 align-items-center"
+						key={laneKey}
+					>
+						<Form.Label column sm={4}>
+							{t('MiniGames:lane-button-label', { lane: index + 1 })}
+						</Form.Label>
+						<Col sm={5}>
+							<Form.Select
+								value={options[laneKey]}
+								onChange={(event) =>
+									setOptions({
+										...options,
+										[laneKey]: Number(event.target.value),
+									})
+								}
+							>
+								{laneButtonOptions.map((button) => (
+									<option key={button.label} value={button.value}>
+										{BUTTONS[buttonLabelType]?.[button.label] || button.label}
+									</option>
+								))}
+							</Form.Select>
+						</Col>
+					</Form.Group>
+				))}
 			</Section>
 
 			<div className="d-flex align-items-center gap-3 mt-3">

@@ -24,6 +24,10 @@ void RhythmGame::configure(const MiniGameOptions& options, uint16_t width, uint1
     bpm = options.rhythmBpm < 60 ? 60 : (options.rhythmBpm > 240 ? 240 : options.rhythmBpm);
     difficulty = options.rhythmDifficulty < 1 ? 1 :
         (options.rhythmDifficulty > 3 ? 3 : options.rhythmDifficulty);
+    laneButtons[0] = options.rhythmLane1Button;
+    laneButtons[1] = options.rhythmLane2Button;
+    laneButtons[2] = options.rhythmLane3Button;
+    laneButtons[3] = options.rhythmLane4Button;
 }
 
 void RhythmGame::reset(uint32_t now) {
@@ -101,14 +105,10 @@ void RhythmGame::update(const MiniGameInput& input, uint32_t now) {
         nextSpawnTime += noteInterval();
     }
 
-    const uint32_t laneButtons[LANE_COUNT] = {
-        GAMEPAD_MASK_B1,
-        GAMEPAD_MASK_B2,
-        GAMEPAD_MASK_B3,
-        GAMEPAD_MASK_B4,
-    };
+    const uint32_t pressedInputs =
+        input.pressedButtons | (static_cast<uint32_t>(input.pressedDpad) << 16);
     for (uint8_t lane = 0; lane < LANE_COUNT; lane++) {
-        if (input.pressedButtons & laneButtons[lane]) {
+        if (pressedInputs & laneButtons[lane]) {
             hitLane(lane, now);
         }
     }

@@ -954,6 +954,10 @@ app.get('/api/getMiniGameOptions', (req, res) => {
 		defaultGameId: 1,
 		rhythmBpm: 120,
 		rhythmDifficulty: 2,
+		rhythmLane1Button: 1 << 0,
+		rhythmLane2Button: 1 << 1,
+		rhythmLane3Button: 1 << 2,
+		rhythmLane4Button: 1 << 3,
 		games: [
 			{
 				gameId: 1,

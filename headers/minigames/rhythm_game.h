@@ -40,6 +40,7 @@ private:
     uint16_t displayHeight = 64;
     uint32_t bpm = 120;
     uint32_t difficulty = 2;
+    uint32_t laneButtons[LANE_COUNT] {};
     uint32_t nextSpawnTime = 0;
     uint32_t score = 0;
     uint16_t combo = 0;

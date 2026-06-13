@@ -1169,6 +1169,10 @@ void ConfigUtils::initUnsetPropertiesWithDefaults(Config& config)
     INIT_UNSET_PROPERTY(miniGameOptions, defaultGameId, MINI_GAME_RHYTHM_ID);
     INIT_UNSET_PROPERTY(miniGameOptions, rhythmBpm, MINI_GAME_RHYTHM_BPM);
     INIT_UNSET_PROPERTY(miniGameOptions, rhythmDifficulty, MINI_GAME_RHYTHM_DIFFICULTY);
+    INIT_UNSET_PROPERTY(miniGameOptions, rhythmLane1Button, GAMEPAD_MASK_B1);
+    INIT_UNSET_PROPERTY(miniGameOptions, rhythmLane2Button, GAMEPAD_MASK_B2);
+    INIT_UNSET_PROPERTY(miniGameOptions, rhythmLane3Button, GAMEPAD_MASK_B3);
+    INIT_UNSET_PROPERTY(miniGameOptions, rhythmLane4Button, GAMEPAD_MASK_B4);
     if (miniGameOptions.games_count == 0) {
         INIT_UNSET_PROPERTY(miniGameOptions.games[0], gameId, MINI_GAME_RHYTHM_ID);
         INIT_UNSET_PROPERTY(miniGameOptions.games[0], enabled, true);

@@ -177,7 +177,9 @@ int runSelfTest() {
 	RhythmGame game;
 	GPGFX display(128, 64);
 	const SimulatorOptions simulatorOptions;
-	game.configure(makeGameOptions(simulatorOptions), 128, 64);
+	MiniGameOptions gameOptions = makeGameOptions(simulatorOptions);
+	gameOptions.rhythmLane1Button = GAMEPAD_MASK_L1;
+	game.configure(gameOptions, 128, 64);
 	game.reset(0);
 
 	MiniGameInput input {};
@@ -187,6 +189,25 @@ int runSelfTest() {
 	game.render(display);
 	if (display.litPixelCount() == 0 || !statusContains(display, "S:0 C:0 M:0")) {
 		std::cerr << "Self-test failed: first note did not render\n";
+		return 1;
+	}
+
+	input.pressedButtons = GAMEPAD_MASK_B1;
+	setSimulatedMillis(1650);
+	game.update(input, getMillis());
+	display.clearScreen();
+	game.render(display);
+	if (!statusContains(display, "S:0 C:0 M:0")) {
+		std::cerr << "Self-test failed: old lane button remained active\n";
+		return 1;
+	}
+
+	input.pressedButtons = GAMEPAD_MASK_L1;
+	game.update(input, getMillis());
+	display.clearScreen();
+	game.render(display);
+	if (!statusContains(display, "S:101 C:1 M:0")) {
+		std::cerr << "Self-test failed: remapped lane button did not score\n";
 		return 1;
 	}
 

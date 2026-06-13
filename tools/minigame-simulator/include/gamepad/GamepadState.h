@@ -16,6 +16,10 @@
 #define GAMEPAD_MASK_B2 (1U << 1)
 #define GAMEPAD_MASK_B3 (1U << 2)
 #define GAMEPAD_MASK_B4 (1U << 3)
+#define GAMEPAD_MASK_L1 (1U << 4)
+#define GAMEPAD_MASK_R1 (1U << 5)
+#define GAMEPAD_MASK_L2 (1U << 6)
+#define GAMEPAD_MASK_R2 (1U << 7)
 #define GAMEPAD_MASK_S1 (1U << 8)
 
 struct GamepadState {

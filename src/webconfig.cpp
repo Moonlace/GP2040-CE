@@ -1250,7 +1250,7 @@ std::string setBootModeOptions() {
 }
 
 std::string getMiniGameOptions() {
-	const size_t capacity = JSON_OBJECT_SIZE(8) + JSON_ARRAY_SIZE(8) + (JSON_OBJECT_SIZE(4) * 8);
+	const size_t capacity = JSON_OBJECT_SIZE(12) + JSON_ARRAY_SIZE(8) + (JSON_OBJECT_SIZE(4) * 8);
 	DynamicJsonDocument doc(capacity);
 	MiniGameOptions& options = Storage::getInstance().getMiniGameOptions();
 
@@ -1258,6 +1258,10 @@ std::string getMiniGameOptions() {
 	writeDoc(doc, "defaultGameId", options.defaultGameId);
 	writeDoc(doc, "rhythmBpm", options.rhythmBpm);
 	writeDoc(doc, "rhythmDifficulty", options.rhythmDifficulty);
+	writeDoc(doc, "rhythmLane1Button", options.rhythmLane1Button);
+	writeDoc(doc, "rhythmLane2Button", options.rhythmLane2Button);
+	writeDoc(doc, "rhythmLane3Button", options.rhythmLane3Button);
+	writeDoc(doc, "rhythmLane4Button", options.rhythmLane4Button);
 
 	JsonArray games = doc.createNestedArray("games");
 	for (size_t i = 0; i < options.games_count; i++) {
@@ -1280,6 +1284,18 @@ std::string setMiniGameOptions() {
 	options.defaultGameId = request["defaultGameId"].as<uint32_t>();
 	options.rhythmBpm = std::max<uint32_t>(60, std::min<uint32_t>(240, request["rhythmBpm"].as<uint32_t>()));
 	options.rhythmDifficulty = std::max<uint32_t>(1, std::min<uint32_t>(3, request["rhythmDifficulty"].as<uint32_t>()));
+	if (request.containsKey("rhythmLane1Button")) {
+		options.rhythmLane1Button = request["rhythmLane1Button"].as<uint32_t>();
+	}
+	if (request.containsKey("rhythmLane2Button")) {
+		options.rhythmLane2Button = request["rhythmLane2Button"].as<uint32_t>();
+	}
+	if (request.containsKey("rhythmLane3Button")) {
+		options.rhythmLane3Button = request["rhythmLane3Button"].as<uint32_t>();
+	}
+	if (request.containsKey("rhythmLane4Button")) {
+		options.rhythmLane4Button = request["rhythmLane4Button"].as<uint32_t>();
+	}
 
 	JsonArray games = request["games"];
 	size_t i = 0;

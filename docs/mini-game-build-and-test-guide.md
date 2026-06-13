@@ -176,9 +176,9 @@ another route into the bootloader:
 4. Copy the matching UF2 to that drive and wait for the controller to restart.
 
 After the new firmware boots, open the Web Configurator's `Mini Games` page, enable
-the add-on and desired games, select the boot-entry button, save, and reboot. Hold
-that configured button while powering on or rebooting to let the mini-game add-on
-take ownership of the display.
+the add-on and desired games, configure the four Rhythm Rush lane buttons, select
+the boot-entry button, save, and reboot. Hold that configured boot button while
+powering on or rebooting to let the mini-game add-on take ownership of the display.
 
 ### Initialize dependencies
 

@@ -30,6 +30,10 @@ message MiniGameOptions {
     optional uint32 rhythmBpm = 3;
     optional uint32 rhythmDifficulty = 4;
     repeated MiniGameEntry games = 5 [(nanopb).max_count = 8];
+    optional uint32 rhythmLane1Button = 6;
+    optional uint32 rhythmLane2Button = 7;
+    optional uint32 rhythmLane3Button = 8;
+    optional uint32 rhythmLane4Button = 9;
 }
 
 message GamepadOptions

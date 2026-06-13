@@ -1,11 +1,15 @@
 param(
 	[switch]$Test,
+	[switch]$Bot,
+	[switch]$BotMatrix,
 	[ValidateRange(60, 240)]
 	[int]$Bpm = 120,
 	[ValidateRange(1, 3)]
 	[int]$Difficulty = 2,
 	[ValidateSet(32, 64)]
-	[int]$Height = 64
+	[int]$Height = 64,
+	[ValidateRange(2, 300)]
+	[int]$DurationSeconds = 20
 )
 
 $ErrorActionPreference = 'Stop'
@@ -77,6 +81,20 @@ if ($LASTEXITCODE -ne 0) {
 
 if ($Test) {
 	& $ctest --test-dir $buildDirectory --output-on-failure
+	exit $LASTEXITCODE
+}
+
+if ($BotMatrix) {
+	& $executable --bot-matrix --bot-duration-ms ($DurationSeconds * 1000)
+	exit $LASTEXITCODE
+}
+
+if ($Bot) {
+	& $executable --bot `
+		--bpm $Bpm `
+		--difficulty $Difficulty `
+		--height $Height `
+		--bot-duration-ms ($DurationSeconds * 1000)
 	exit $LASTEXITCODE
 }
 

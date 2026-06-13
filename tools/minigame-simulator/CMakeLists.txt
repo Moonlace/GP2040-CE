@@ -4,6 +4,8 @@ project(GP2040MiniGameSimulator LANGUAGES CXX)
 
 add_executable(gp2040-minigame-sim
 	src/GPGFX.cpp
+	src/RhythmBot.cpp
+	src/SimulatorClock.cpp
 	src/main.cpp
 	../../src/minigames/rhythm_game.cpp
 )
@@ -26,5 +28,9 @@ if(BUILD_TESTING)
 	add_test(
 		NAME rhythm-game-self-test
 		COMMAND gp2040-minigame-sim --self-test
+	)
+	add_test(
+		NAME rhythm-game-bot-matrix
+		COMMAND gp2040-minigame-sim --bot-matrix
 	)
 endif()

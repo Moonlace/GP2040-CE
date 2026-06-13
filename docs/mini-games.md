@@ -44,7 +44,9 @@ stand-ins. It is not referenced by the firmware CMake project, so desktop
 dependencies cannot enter Pico builds.
 
 See `tools/minigame-simulator/README.md` for build, interactive controls, and
-self-test commands.
+self-test commands. The simulator also includes a visual autoplay bot that
+detects notes from the framebuffer and validates perfect-play results across a
+tempo, difficulty, and display-size matrix.
 
 ## Rhythm Rush
 

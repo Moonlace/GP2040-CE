@@ -33,12 +33,35 @@ Options:
 --difficulty 1..3
 --height 32|64
 --self-test
+--bot
+--bot-matrix
+--bot-duration-ms 2000..
 ```
 
 Run the deterministic smoke test with:
 
 ```powershell
 .\tools\minigame-simulator\run.cmd -Test
+```
+
+## Autoplay bot
+
+The bot tests Rhythm Rush through the same public input and rendered display
+surface used by the simulator. It does not inspect the game's note array. It
+watches the framebuffer for notes reaching each lane's hit line, presses B1
+through B4, and verifies the exact perfect-play score, combo, and miss count.
+
+Run one configuration:
+
+```powershell
+.\tools\minigame-simulator\run.cmd -Bot -Bpm 180 -Difficulty 3 -Height 64
+```
+
+Run the full 18-case matrix across 60, 120, and 240 BPM, all three difficulty
+levels, and both display heights:
+
+```powershell
+.\tools\minigame-simulator\run.cmd -BotMatrix
 ```
 
 This simulator tests game behavior and rendering calls. Real hardware is still

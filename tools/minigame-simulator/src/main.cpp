@@ -3,6 +3,8 @@
  */
 
 #include "GPGFX.h"
+#include "RhythmBot.h"
+#include "SimulatorClock.h"
 #include "gamepad.h"
 #include "minigames/rhythm_game.h"
 
@@ -24,13 +26,14 @@
 #endif
 
 namespace {
-uint32_t simulatedMillis = 0;
-
 struct SimulatorOptions {
 	uint32_t bpm = 120;
 	uint32_t difficulty = 2;
 	uint16_t height = 64;
+	uint32_t botDurationMs = 20000;
 	bool selfTest = false;
+	bool bot = false;
+	bool botMatrix = false;
 };
 
 class Keyboard {
@@ -116,6 +119,12 @@ SimulatorOptions parseOptions(int argc, char* argv[]) {
 		const std::string argument = argv[i];
 		if (argument == "--self-test") {
 			options.selfTest = true;
+		} else if (argument == "--bot") {
+			options.bot = true;
+		} else if (argument == "--bot-matrix") {
+			options.botMatrix = true;
+		} else if (argument == "--bot-duration-ms" && i + 1 < argc) {
+			options.botDurationMs = parseUnsigned(argv[++i], "--bot-duration-ms");
 		} else if (argument == "--bpm" && i + 1 < argc) {
 			options.bpm = parseUnsigned(argv[++i], "--bpm");
 		} else if (argument == "--difficulty" && i + 1 < argc) {
@@ -128,7 +137,10 @@ SimulatorOptions parseOptions(int argc, char* argv[]) {
 				<< "  --bpm 60..240\n"
 				<< "  --difficulty 1..3\n"
 				<< "  --height 32|64\n"
-				<< "  --self-test\n";
+				<< "  --self-test\n"
+				<< "  --bot\n"
+				<< "  --bot-matrix\n"
+				<< "  --bot-duration-ms 2000..\n";
 			std::exit(0);
 		} else {
 			throw std::runtime_error("Unknown or incomplete option: " + argument);
@@ -143,6 +155,9 @@ SimulatorOptions parseOptions(int argc, char* argv[]) {
 	}
 	if (options.height != 32 && options.height != 64) {
 		throw std::runtime_error("--height must be 32 or 64");
+	}
+	if (options.botDurationMs < 2000) {
+		throw std::runtime_error("--bot-duration-ms must be at least 2000");
 	}
 	return options;
 }
@@ -166,8 +181,8 @@ int runSelfTest() {
 	game.reset(0);
 
 	MiniGameInput input {};
-	simulatedMillis = 250;
-	game.update(input, simulatedMillis);
+	setSimulatedMillis(250);
+	game.update(input, getMillis());
 	display.clearScreen();
 	game.render(display);
 	if (display.litPixelCount() == 0 || !statusContains(display, "S:0 C:0 M:0")) {
@@ -175,9 +190,9 @@ int runSelfTest() {
 		return 1;
 	}
 
-	simulatedMillis = 1650;
+	setSimulatedMillis(1650);
 	input.pressedButtons = GAMEPAD_MASK_B1;
-	game.update(input, simulatedMillis);
+	game.update(input, getMillis());
 	display.clearScreen();
 	game.render(display);
 	if (!statusContains(display, "S:101 C:1 M:0")) {
@@ -185,9 +200,9 @@ int runSelfTest() {
 		return 1;
 	}
 
-	simulatedMillis = 4000;
+	setSimulatedMillis(4000);
 	input.pressedButtons = 0;
-	game.update(input, simulatedMillis);
+	game.update(input, getMillis());
 	display.clearScreen();
 	game.render(display);
 	if (statusContains(display, "M:0")) {
@@ -198,8 +213,8 @@ int runSelfTest() {
 	GPGFX shortDisplay(128, 32);
 	game.configure(makeGameOptions(simulatorOptions), 128, 32);
 	game.reset(0);
-	simulatedMillis = 250;
-	game.update(input, simulatedMillis);
+	setSimulatedMillis(250);
+	game.update(input, getMillis());
 	shortDisplay.clearScreen();
 	game.render(shortDisplay);
 	if (shortDisplay.litPixelCount() == 0) {
@@ -209,6 +224,46 @@ int runSelfTest() {
 
 	std::cout << "Rhythm game self-test passed\n";
 	return 0;
+}
+
+int runBot(const SimulatorOptions& options) {
+	const RhythmBotResult result = runRhythmBot(
+		options.bpm,
+		options.difficulty,
+		options.height,
+		options.botDurationMs
+	);
+	printRhythmBotResult(result, std::cout);
+	return result.passed ? 0 : 1;
+}
+
+int runBotMatrix(const SimulatorOptions& options) {
+	const uint32_t tempos[] = {60, 120, 240};
+	const uint32_t difficulties[] = {1, 2, 3};
+	const uint16_t heights[] = {32, 64};
+	uint32_t passed = 0;
+	uint32_t total = 0;
+
+	std::cout
+		<< "Rhythm Rush visual autoplay matrix ("
+		<< options.botDurationMs << " ms simulated per case)\n";
+	for (uint16_t height : heights) {
+		for (uint32_t difficulty : difficulties) {
+			for (uint32_t bpm : tempos) {
+				const RhythmBotResult result = runRhythmBot(
+					bpm,
+					difficulty,
+					height,
+					options.botDurationMs
+				);
+				printRhythmBotResult(result, std::cout);
+				passed += result.passed ? 1U : 0U;
+				total++;
+			}
+		}
+	}
+	std::cout << "Bot matrix: " << passed << '/' << total << " cases passed\n";
+	return passed == total ? 0 : 1;
 }
 
 int runInteractive(const SimulatorOptions& simulatorOptions) {
@@ -224,9 +279,9 @@ int runInteractive(const SimulatorOptions& simulatorOptions) {
 
 	while (running) {
 		const auto elapsed = std::chrono::steady_clock::now() - startedAt;
-		simulatedMillis = static_cast<uint32_t>(
+		setSimulatedMillis(static_cast<uint32_t>(
 			std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count()
-		);
+		));
 
 		MiniGameInput input {};
 		char key = 0;
@@ -234,13 +289,13 @@ int runInteractive(const SimulatorOptions& simulatorOptions) {
 			if (key == 'q' || key == 'Q') {
 				running = false;
 			} else if (key == 'r' || key == 'R') {
-				game.reset(simulatedMillis);
+				game.reset(getMillis());
 			} else {
 				input.pressedButtons |= buttonForKey(key);
 			}
 		}
 
-		game.update(input, simulatedMillis);
+		game.update(input, getMillis());
 		display.clearScreen();
 		game.render(display);
 		display.present(std::cout);
@@ -258,14 +313,19 @@ int runInteractive(const SimulatorOptions& simulatorOptions) {
 }
 }
 
-uint32_t getMillis() {
-	return simulatedMillis;
-}
-
 int main(int argc, char* argv[]) {
 	try {
 		const SimulatorOptions options = parseOptions(argc, argv);
-		return options.selfTest ? runSelfTest() : runInteractive(options);
+		if (options.selfTest) {
+			return runSelfTest();
+		}
+		if (options.botMatrix) {
+			return runBotMatrix(options);
+		}
+		if (options.bot) {
+			return runBot(options);
+		}
+		return runInteractive(options);
 	} catch (const std::exception& error) {
 		std::cerr << error.what() << '\n';
 		return 2;

@@ -19,6 +19,9 @@ output add-ons are not loaded in this mode.
 Input remains disarmed until the boot combination is released. This prevents
 the held boot button from immediately starting or exiting a game.
 
+An active game owns the complete framebuffer. Launcher or add-on help text must
+not be drawn after the game's `render` call because it can overwrite gameplay.
+
 ## Adding a game
 
 Mini games are compiled into the firmware. This avoids loading executable code

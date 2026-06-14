@@ -149,9 +149,6 @@ void MiniGameAddon::process() {
     display->clearScreen();
     if (activeGame != nullptr) {
         activeGame->render(*display);
-        if (displayHeight > 32) {
-            display->drawText(0, 7, "S1: Menu");
-        }
     } else {
         drawLauncher();
     }

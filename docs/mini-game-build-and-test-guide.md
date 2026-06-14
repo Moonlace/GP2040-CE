@@ -185,6 +185,10 @@ USB remains a fallback for entering Web Configurator mode. From normal controlle
 mode, release all buttons briefly and then hold `S2 + B3 + B4` for four seconds to
 reboot into Web Configurator mode.
 
+On the Haute42 COSMOX Lite, `S2` is Start. `B3` and `B4` are the first two
+buttons on the upper action-button row: `X` then `Y` in XInput labels, or `Y`
+then `X` in Nintendo Switch labels.
+
 ### Initialize dependencies
 
 ```powershell

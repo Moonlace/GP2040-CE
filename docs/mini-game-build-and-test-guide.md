@@ -189,6 +189,10 @@ On the Haute42 COSMOX Lite, `S2` is Start. `B3` and `B4` are the first two
 buttons on the upper action-button row: `X` then `Y` in XInput labels, or `Y`
 then `X` in Nintendo Switch labels.
 
+Fresh or reset Haute42 COSMOX Lite configurations assign mini-game boot to
+`B4` by default. Existing saved boot mappings are preserved and can be changed
+under `Boot Mode Configuration`.
+
 ### Initialize dependencies
 
 ```powershell

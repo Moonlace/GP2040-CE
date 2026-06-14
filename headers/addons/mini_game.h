@@ -21,6 +21,10 @@
 #define MINI_GAME_RHYTHM_DIFFICULTY 2
 #endif
 
+#ifndef MINI_GAME_BOOT_PIN_MASK
+#define MINI_GAME_BOOT_PIN_MASK static_cast<uint32_t>(-1)
+#endif
+
 #define MiniGameAddonName "MiniGame"
 
 class MiniGameAddon : public GPAddon {

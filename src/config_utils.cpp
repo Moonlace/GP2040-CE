@@ -324,7 +324,7 @@ void ConfigUtils::initUnsetPropertiesWithDefaults(Config& config)
     INIT_UNSET_PROPERTY(config.gamepadOptions, miniMenuGamepadInput, MINI_MENU_GAMEPAD_INPUT);
 
     // bootModeOptions
-    INIT_UNSET_PROPERTY(config.bootModeOptions, miniGamePinMask, static_cast<uint32_t>(-1));
+    INIT_UNSET_PROPERTY(config.bootModeOptions, miniGamePinMask, MINI_GAME_BOOT_PIN_MASK);
 
     // hotkeyOptions
     HotkeyOptions& hotkeyOptions = config.hotkeyOptions;

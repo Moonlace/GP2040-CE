@@ -95,15 +95,20 @@ const useProfilesStore = create<State & Actions>()((set, get) => ({
 	fetchProfiles: async () => {
 		set({ loadingProfiles: true });
 
-		// TODO, unify baseProfile with other profiles when done in web api
-		const baseProfile = await WebApi.getPinMappings();
-		const profiles = await WebApi.getProfileOptions();
+		try {
+			// TODO, unify baseProfile with other profiles when done in web api
+			const baseProfile = await WebApi.getPinMappings();
+			const profiles = (await WebApi.getProfileOptions()) ?? [];
 
-		set((state) => ({
-			...state,
-			profiles: [baseProfile, ...profiles],
-			loadingProfiles: false,
-		}));
+			set((state) => ({
+				...state,
+				profiles: baseProfile ? [baseProfile, ...profiles] : profiles,
+				loadingProfiles: false,
+			}));
+		} catch (error) {
+			console.error(error);
+			set({ loadingProfiles: false });
+		}
 	},
 	copyBaseProfile: (profileIndex) =>
 		set((state) => ({

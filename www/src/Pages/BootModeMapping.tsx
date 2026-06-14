@@ -49,7 +49,9 @@ const PIN_OPTIONS: PinOption[] = Array.from({ length: NUM_PINS }, (_, i) => ({
 }));
 
 function BootModeSelect({ mappingKey }: { mappingKey: string }) {
-	const inputMode = useBootModeStore((state) => state.bootModes[mappingKey].inputMode);
+	const inputMode = useBootModeStore(
+		(state) => state.bootModes[mappingKey].inputMode,
+	);
 	const saveAttempted = useBootModeStore((state) => state.saveAttempted);
 	const { setInputMode, clearErrors, setDirty } = useBootModeStoreActions();
 
@@ -95,7 +97,9 @@ function BootModeSelect({ mappingKey }: { mappingKey: string }) {
 
 function PinSelect({ mappingKey }: { mappingKey: string }) {
 	const pins = useBootModeStore((state) => state.bootModes[mappingKey].pins);
-	const modesWithDuplicates = useBootModeStore((state) => state.modesWithDuplicates);
+	const modesWithDuplicates = useBootModeStore(
+		(state) => state.modesWithDuplicates,
+	);
 	const saveAttempted = useBootModeStore((state) => state.saveAttempted);
 
 	const { addPin, removePin, validatePins, clearErrors, setDirty } =
@@ -104,7 +108,9 @@ function PinSelect({ mappingKey }: { mappingKey: string }) {
 	// Need the profile pin mapping to determine which pins are assigned to addons or reserved,
 	// relying on the assumption that these are the same across all profiles.
 	const profilePins: { [key: string]: MaskPayload } = useProfilesStore(
-		useShallow((state) => omit(state.profiles[0], ['profileLabel', 'enabled'])),
+		useShallow((state) =>
+			omit(state.profiles[0] ?? {}, ['profileLabel', 'enabled']),
+		),
 	);
 
 	const { t } = useTranslation('');
@@ -116,7 +122,10 @@ function PinSelect({ mappingKey }: { mappingKey: string }) {
 
 	const values = PIN_OPTIONS.filter(({ value }) => pins.has(value));
 
-	const onChange = (_: MultiValue<PinOption>, action: ActionMeta<PinOption>) => {
+	const onChange = (
+		_: MultiValue<PinOption>,
+		action: ActionMeta<PinOption>,
+	) => {
 		if (action.action === 'select-option' && action.option !== undefined) {
 			addPin(mappingKey, action.option.value);
 		} else if (action.action === 'remove-value') {
@@ -128,19 +137,28 @@ function PinSelect({ mappingKey }: { mappingKey: string }) {
 	};
 
 	const isInvalid =
-		modesWithDuplicates.includes(mappingKey) || (saveAttempted && values.length == 0);
+		modesWithDuplicates.includes(mappingKey) ||
+		(saveAttempted && values.length == 0);
 
 	const isOptionDisabled = (option: PinOption) => {
+		const pin = profilePins[pinField(option.value)];
+		if (!pin) {
+			return false;
+		}
 		return [BUTTON_ACTIONS.RESERVED, BUTTON_ACTIONS.ASSIGNED_TO_ADDON].includes(
-			profilePins[pinField(option.value)].action,
+			pin.action,
 		);
 	};
 
 	const getOptionLabel = (option: PinOption) => {
-		if (profilePins[pinField(option.value)].action == BUTTON_ACTIONS.RESERVED) {
+		const pin = profilePins[pinField(option.value)];
+		if (!pin) {
+			return option.label;
+		}
+		if (pin.action == BUTTON_ACTIONS.RESERVED) {
 			return `${option.label} (Reserved)`;
 		}
-		if (profilePins[pinField(option.value)].action == BUTTON_ACTIONS.ASSIGNED_TO_ADDON) {
+		if (pin.action == BUTTON_ACTIONS.ASSIGNED_TO_ADDON) {
 			return `${option.label} (Assigned to Add-on)`;
 		}
 		return option.label;
@@ -303,7 +321,9 @@ export default function BootModeMappingPage() {
 	}, []);
 
 	// The delete-able input mode keys (i.e. not web-config or usb mode)
-	const inputModeKeys = Object.keys(bootModes).filter((k) => k.startsWith('inputMode-'));
+	const inputModeKeys = Object.keys(bootModes).filter((k) =>
+		k.startsWith('inputMode-'),
+	);
 
 	const handleSubmit = () => {
 		validateRequired(t('BootModeMapping:required-validation-err'));

@@ -430,6 +430,14 @@ async function setBootModeOptions(options) {
 	return Http.post(`${baseUrl}/api/setBootModeOptions`, options);
 }
 
+async function getMiniGameOptions() {
+	return Http.get(`${baseUrl}/api/getMiniGameOptions`);
+}
+
+async function setMiniGameOptions(options) {
+	return Http.post(`${baseUrl}/api/setMiniGameOptions`, options);
+}
+
 async function getKeyMappings(setLoading) {
 	setLoading(true);
 
@@ -725,6 +733,8 @@ export default {
 	setPinMappings,
 	getBootModeOptions,
 	setBootModeOptions,
+	getMiniGameOptions,
+	setMiniGameOptions,
 	getProfileOptions,
 	setProfileOptions,
 	getKeyMappings,

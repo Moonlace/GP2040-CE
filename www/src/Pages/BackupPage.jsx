@@ -53,6 +53,10 @@ const API_BINDING = {
 		get: WebApi.getAddonsOptions,
 		set: WebApi.setAddonsOptions,
 	},
+	miniGames: {
+		get: WebApi.getMiniGameOptions,
+		set: WebApi.setMiniGameOptions,
+	},
 	// new api, add it here
 	// "example":	{get: WebApi.getNewAPI,			set: WebApi.setNewAPI},
 };

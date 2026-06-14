@@ -7,6 +7,7 @@
 #include "storagemanager.h"
 #include "eventmanager.h"
 #include "layoutmanager.h"
+#include "minigames/rhythm_game.h"
 #include "peripheralmanager.h"
 #include "animationstorage.h"
 #include "system.h"
@@ -15,6 +16,7 @@
 #include "version.h"
 
 #include <cstring>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <memory>
@@ -44,7 +46,7 @@
 
 extern struct fsdata_file file__index_html[];
 
-const static char* spaPaths[] = { "/backup", "/display-config", "/led-config", "/pin-mapping", "/settings", "/reset-settings", "/add-ons", "/custom-theme", "/macro", "/peripheral-mapping", "/boot-mode-mapping" };
+const static char* spaPaths[] = { "/backup", "/display-config", "/led-config", "/pin-mapping", "/settings", "/reset-settings", "/add-ons", "/custom-theme", "/macro", "/peripheral-mapping", "/boot-mode-mapping", "/mini-games" };
 const static char* excludePaths[] = { "/css", "/images", "/js", "/static" };
 const static uint32_t rebootDelayMs = 500;
 static string http_post_uri;
@@ -1244,6 +1246,85 @@ std::string setBootModeOptions() {
 
 	EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(true));
 	return serialize_json(doc);
+}
+
+std::string getMiniGameOptions() {
+	const size_t capacity = JSON_OBJECT_SIZE(12) + JSON_ARRAY_SIZE(8) + (JSON_OBJECT_SIZE(4) * 8);
+	DynamicJsonDocument doc(capacity);
+	MiniGameOptions& options = Storage::getInstance().getAddonOptions().miniGameOptions;
+
+	writeDoc(doc, "enabled", options.enabled);
+	writeDoc(doc, "defaultGameId", options.defaultGameId);
+	writeDoc(doc, "rhythmBpm", options.rhythmBpm);
+	writeDoc(doc, "rhythmDifficulty", options.rhythmDifficulty);
+	writeDoc(doc, "rhythmLane1Button", options.rhythmLane1Button);
+	writeDoc(doc, "rhythmLane2Button", options.rhythmLane2Button);
+	writeDoc(doc, "rhythmLane3Button", options.rhythmLane3Button);
+	writeDoc(doc, "rhythmLane4Button", options.rhythmLane4Button);
+
+	JsonArray games = doc.createNestedArray("games");
+	for (size_t i = 0; i < options.games_count; i++) {
+		JsonObject game = games.createNestedObject();
+		game["gameId"] = options.games[i].gameId;
+		game["enabled"] = options.games[i].enabled;
+		game["order"] = options.games[i].order;
+		game["name"] = options.games[i].gameId == MINI_GAME_RHYTHM_ID ? MINI_GAME_RHYTHM_TITLE : "Unknown";
+	}
+
+	return serialize_json(doc);
+}
+
+std::string setMiniGameOptions() {
+	DynamicJsonDocument doc = get_post_data();
+	JsonObject request = doc.as<JsonObject>();
+	MiniGameOptions& options = Storage::getInstance().getAddonOptions().miniGameOptions;
+
+	options.enabled = request["enabled"].as<bool>();
+	options.defaultGameId = request["defaultGameId"].as<uint32_t>();
+	options.rhythmBpm = std::max<uint32_t>(60, std::min<uint32_t>(240, request["rhythmBpm"].as<uint32_t>()));
+	options.rhythmDifficulty = std::max<uint32_t>(1, std::min<uint32_t>(3, request["rhythmDifficulty"].as<uint32_t>()));
+	if (request.containsKey("rhythmLane1Button")) {
+		options.rhythmLane1Button = request["rhythmLane1Button"].as<uint32_t>();
+	}
+	if (request.containsKey("rhythmLane2Button")) {
+		options.rhythmLane2Button = request["rhythmLane2Button"].as<uint32_t>();
+	}
+	if (request.containsKey("rhythmLane3Button")) {
+		options.rhythmLane3Button = request["rhythmLane3Button"].as<uint32_t>();
+	}
+	if (request.containsKey("rhythmLane4Button")) {
+		options.rhythmLane4Button = request["rhythmLane4Button"].as<uint32_t>();
+	}
+
+	JsonArray games = request["games"];
+	size_t i = 0;
+	for (JsonObject game : games) {
+		options.games[i].gameId = game["gameId"].as<uint32_t>();
+		options.games[i].enabled = game["enabled"].as<bool>();
+		options.games[i].order = game["order"].as<uint32_t>();
+		if (++i >= 8) {
+			break;
+		}
+	}
+	options.games_count = i;
+	bool defaultGameEnabled = false;
+	for (size_t gameIndex = 0; gameIndex < options.games_count; gameIndex++) {
+		if (options.games[gameIndex].enabled && options.games[gameIndex].gameId == options.defaultGameId) {
+			defaultGameEnabled = true;
+			break;
+		}
+	}
+	if (!defaultGameEnabled) {
+		for (size_t gameIndex = 0; gameIndex < options.games_count; gameIndex++) {
+			if (options.games[gameIndex].enabled) {
+				options.defaultGameId = options.games[gameIndex].gameId;
+				break;
+			}
+		}
+	}
+
+	EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(true));
+	return getMiniGameOptions();
 }
 
 std::string setKeyMappings()
@@ -2779,6 +2860,8 @@ static const std::pair<const char*, HandlerFuncPtr> handlerFuncs[] =
     { "/api/getJoystickCenter2", getJoystickCenter2 },
 		{ "/api/getBootModeOptions", getBootModeOptions },
 		{ "/api/setBootModeOptions", setBootModeOptions },
+		{ "/api/getMiniGameOptions", getMiniGameOptions },
+		{ "/api/setMiniGameOptions", setMiniGameOptions },
 #if !defined(NDEBUG)
     { "/api/echo", echo },
 #endif

@@ -10,6 +10,7 @@ export default {
 	'led-config-label': 'LED Configuration',
 	'links-label': 'Links',
 	'macro-label': 'Macros Configuration',
+	'mini-games-label': 'Mini Games',
 	'pin-mapping-label': 'GPIO Pin Mapping',
 	'boot-mode-mapping-label': 'Boot Mode Configuration',
 	'multi-mapping-label': 'Multi Mapping',

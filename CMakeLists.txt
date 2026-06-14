@@ -249,6 +249,7 @@ src/display/ui/elements/GPSprite.cpp
 src/display/ui/screens/ButtonLayoutScreen.cpp
 src/display/ui/screens/ConfigScreen.cpp
 src/display/ui/screens/MainMenuScreen.cpp
+src/display/ui/screens/MiniGameScreen.cpp
 src/display/ui/screens/PinViewerScreen.cpp
 src/display/ui/screens/RestartScreen.cpp
 src/display/ui/screens/StatsScreen.cpp
@@ -296,6 +297,7 @@ src/addons/spi_analog_ads1256.cpp
 src/addons/gamepad_usb_host.cpp
 src/addons/gamepad_usb_host_listener.cpp
 src/addons/tg16_input.cpp
+src/minigames/rhythm_game.cpp
 src/animationstation/animation.cpp
 src/animationstation/animationstation.cpp
 src/animationstation/effects/chase.cpp
@@ -357,6 +359,7 @@ headers/display/ui/elements
 headers/display/ui/screens
 headers/animationstation
 headers/animationstation/effects
+headers/minigames
 configs/${GP2040_BOARDCONFIG}
 ${PROTO_OUTPUT_DIR}
 ${CMAKE_BINARY_DIR}/headers

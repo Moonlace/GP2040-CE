@@ -947,6 +947,27 @@ app.get('/api/getBootModeOptions', (req, res) => {
 	});
 });
 
+app.get('/api/getMiniGameOptions', (req, res) => {
+	return res.send({
+		enabled: true,
+		defaultGameId: 1,
+		rhythmBpm: 120,
+		rhythmDifficulty: 2,
+		rhythmLane1Button: 1 << 0,
+		rhythmLane2Button: 1 << 1,
+		rhythmLane3Button: 1 << 2,
+		rhythmLane4Button: 1 << 3,
+		games: [
+			{
+				gameId: 1,
+				enabled: true,
+				order: 0,
+				name: 'Rhythm Rush',
+			},
+		],
+	});
+});
+
 app.post('/api/*', (req, res) => {
 	console.log(req.body);
 	return res.send(req.body);

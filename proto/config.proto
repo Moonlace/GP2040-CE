@@ -17,6 +17,24 @@ message BootModeOptions {
     repeated InputModeMapping inputModeMappings = 4 [(nanopb).max_count = 8];
 }
 
+message MiniGameEntry {
+    optional uint32 gameId = 1;
+    optional bool enabled = 2;
+    optional uint32 order = 3;
+}
+
+message MiniGameOptions {
+    optional bool enabled = 1;
+    optional uint32 defaultGameId = 2;
+    optional uint32 rhythmBpm = 3;
+    optional uint32 rhythmDifficulty = 4;
+    repeated MiniGameEntry games = 5 [(nanopb).max_count = 8];
+    optional uint32 rhythmLane1Button = 6;
+    optional uint32 rhythmLane2Button = 7;
+    optional uint32 rhythmLane3Button = 8;
+    optional uint32 rhythmLane4Button = 9;
+}
+
 message GamepadOptions
 {
     optional InputMode inputMode = 1;
@@ -940,6 +958,7 @@ message AddonOptions
     optional GamepadUSBHostOptions gamepadUSBHostOptions = 28;
     optional TG16Options tg16Options = 29;
     optional HETriggerOptions heTriggerOptions = 30;
+    optional MiniGameOptions miniGameOptions = 31;
 }
 
 message MigrationHistory

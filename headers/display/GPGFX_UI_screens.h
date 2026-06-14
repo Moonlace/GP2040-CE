@@ -10,13 +10,15 @@ enum DisplayMode {
     STATS,
     MAIN_MENU,
     RESTART,
-    SYSTEM_ERROR
+    SYSTEM_ERROR,
+    MINI_GAMES
 };
 
 #include "ui/screens/ButtonLayoutScreen.h"
 #include "ui/screens/ConfigScreen.h"
 #include "ui/screens/DisplaySaverScreen.h"
 #include "ui/screens/MainMenuScreen.h"
+#include "ui/screens/MiniGameScreen.h"
 #include "ui/screens/PinViewerScreen.h"
 #include "ui/screens/RestartScreen.h"
 #include "ui/screens/SplashScreen.h"

@@ -22,6 +22,12 @@ the held boot button from immediately starting or exiting a game.
 An active game owns the complete framebuffer. Launcher or add-on help text must
 not be drawn after the game's `render` call because it can overwrite gameplay.
 
+Mini games can also run inside the normal display add-on while the controller
+is in Web Config mode. Press `R1` on the OLED instruction screen to open Mini
+Games, `B1` to start Rhythm Rush, `S1` to return to the launcher, and `B2` to
+return to the Web Config instruction screen. This path reuses the display
+add-on's existing framebuffer and does not depend on a boot GPIO mapping.
+
 ## Adding a game
 
 Mini games are compiled into the firmware. This avoids loading executable code

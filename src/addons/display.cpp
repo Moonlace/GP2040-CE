@@ -113,6 +113,9 @@ bool DisplayAddon::updateDisplayScreen() {
         case MAIN_MENU:
             gpScreen = new MainMenuScreen(gpDisplay);
             break;
+        case MINI_GAMES:
+            gpScreen = new MiniGameScreen(gpDisplay);
+            break;
         case BUTTONS:
             gpScreen = new ButtonLayoutScreen(gpDisplay);
             break;

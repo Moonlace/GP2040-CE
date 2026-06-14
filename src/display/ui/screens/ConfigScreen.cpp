@@ -27,6 +27,9 @@ int8_t ConfigScreen::update() {
             case (GAMEPAD_MASK_L2):
                 prevButtonState = 0;
                 return DisplayMode::STATS;
+            case (GAMEPAD_MASK_R1):
+                prevButtonState = 0;
+                return DisplayMode::MINI_GAMES;
             default:
                 break;
         }
@@ -37,11 +40,11 @@ int8_t ConfigScreen::update() {
 
 void ConfigScreen::drawScreen() {
     getRenderer()->drawText(2, 0, "[Web Config Mode]");
-    getRenderer()->drawText(0, 1, version);
-    getRenderer()->drawText(0, 2, "[http://192.168.7.1]");
-    getRenderer()->drawText(0, 3, "Preview:");
-    getRenderer()->drawText(0, 4, " B1 > Button");
-    getRenderer()->drawText(0, 5, " B2 > Splash");
-    getRenderer()->drawText(0, 6, " R2 > GPIO Pin Viewer");
-    getRenderer()->drawText(0, 7, " L2 > Stats");
+    getRenderer()->drawText(0, 1, "[http://192.168.7.1]");
+    getRenderer()->drawText(0, 2, "Preview:");
+    getRenderer()->drawText(0, 3, " B1 > Button");
+    getRenderer()->drawText(0, 4, " B2 > Splash");
+    getRenderer()->drawText(0, 5, " R2 > GPIO Pin Viewer");
+    getRenderer()->drawText(0, 6, " L2 > Stats");
+    getRenderer()->drawText(0, 7, " R1 > Mini Games");
 }

@@ -15,7 +15,6 @@ const BOOT_MODES = {
 	GAMEPAD: 0,
 	WEBCONFIG: 1,
 	BOOTSEL: 2,
-	MINIGAME: 3,
 };
 
 const Navigation = () => {
@@ -200,16 +199,6 @@ const Navigation = () => {
 					>
 						{isRebooting !== BOOT_MODES.WEBCONFIG
 							? t('Navigation:reboot-modal-button-web-config-label')
-							: isRebooting
-								? t('Navigation:reboot-modal-button-progress-label')
-								: t('Navigation:reboot-modal-button-success-label')}
-					</Button>
-					<Button
-						variant="info"
-						onClick={() => handleReboot(BOOT_MODES.MINIGAME)}
-					>
-						{isRebooting !== BOOT_MODES.MINIGAME
-							? t('Navigation:reboot-modal-button-mini-games-label')
 							: isRebooting
 								? t('Navigation:reboot-modal-button-progress-label')
 								: t('Navigation:reboot-modal-button-success-label')}

@@ -18,14 +18,14 @@ struct MiniGameInput {
 };
 
 class MiniGame {
-public:
-    virtual ~MiniGame() {}
-    virtual uint32_t id() const = 0;
-    virtual const char* title() const = 0;
-    virtual void configure(const MiniGameOptions& options, uint16_t width, uint16_t height) = 0;
-    virtual void reset(uint32_t now) = 0;
-    virtual void update(const MiniGameInput& input, uint32_t now) = 0;
-    virtual void render(GPGFX& display) = 0;
+    public:
+        virtual ~MiniGame() {}
+        virtual uint32_t id() const = 0;
+        virtual const char* title() const = 0;
+        virtual void configure(const MiniGameOptions& options, uint16_t width, uint16_t height) = 0;
+        virtual void reset(uint32_t now) = 0;
+        virtual void update(const MiniGameInput& input, uint32_t now) = 0;
+        virtual void render(GPGFX& display) = 0;
 };
 
 #endif

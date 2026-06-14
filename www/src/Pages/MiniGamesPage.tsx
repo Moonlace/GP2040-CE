@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import { Alert, Button, Col, Form, Row } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import Section from '../Components/Section';
@@ -52,11 +51,17 @@ export default function MiniGamesPage() {
 			.then(({ data }: { data: MiniGameOptions }) => setOptions(data))
 			.catch(() => setError(t('MiniGames:error-message')))
 			.finally(() => setLoading(false));
-	}, []);
+	}, [t]);
 
 	const updateGame = (gameId: number, enabled: boolean) => {
 		setOptions((current) => ({
 			...current,
+			defaultGameId:
+				!enabled && current.defaultGameId === gameId
+					? (current.games.find(
+							(game) => game.enabled && game.gameId !== gameId,
+						)?.gameId ?? current.defaultGameId)
+					: current.defaultGameId,
 			games: current.games.map((game) =>
 				game.gameId === gameId ? { ...game, enabled } : game,
 			),
@@ -101,12 +106,7 @@ export default function MiniGamesPage() {
 
 	return (
 		<>
-			<Alert variant="info">
-				{t('MiniGames:description')}{' '}
-				<NavLink to="/boot-mode-mapping">
-					{t('Navigation:boot-mode-mapping-label')}
-				</NavLink>
-			</Alert>
+			<Alert variant="info">{t('MiniGames:description')}</Alert>
 			<Section title={t('MiniGames:title')}>
 				<Form.Check
 					type="switch"

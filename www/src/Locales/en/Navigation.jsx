@@ -20,7 +20,6 @@ export default {
 	'reboot-modal-body': 'Select a mode to reboot to',
 	'reboot-modal-button-bootsel-label': 'USB (BOOTSEL)',
 	'reboot-modal-button-controller-label': 'Controller',
-	'reboot-modal-button-mini-games-label': 'Mini Games',
 	'reboot-modal-button-web-config-label': 'Web-config',
 	'reboot-modal-button-progress-label': 'Rebooting',
 	'reboot-modal-button-success-label': 'Done!',

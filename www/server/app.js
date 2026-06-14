@@ -932,7 +932,6 @@ app.get('/api/getBootModeOptions', (req, res) => {
 		enabled: false,
 		webConfigPinMask: 1,
 		usbModePinMask: 14,
-		miniGamePinMask: 16,
 		inputModeMappings: [
 			{
 				pinMask: 2,

@@ -7,6 +7,7 @@
 #include "storagemanager.h"
 #include "eventmanager.h"
 #include "layoutmanager.h"
+#include "minigames/rhythm_game.h"
 #include "peripheralmanager.h"
 #include "animationstorage.h"
 #include "system.h"
@@ -1207,7 +1208,6 @@ std::string getBootModeOptions() {
 	writeDoc(doc, "enabled", bootModeOptions.enabled);
 	writeDoc(doc, "webConfigPinMask", bootModeOptions.webConfigPinMask);
 	writeDoc(doc, "usbModePinMask", bootModeOptions.usbModePinMask);
-	writeDoc(doc, "miniGamePinMask", static_cast<int32_t>(bootModeOptions.miniGamePinMask));
 
 	if (bootModeOptions.inputModeMappings_count == 0) {
         doc.createNestedArray("inputModeMappings");
@@ -1230,7 +1230,6 @@ std::string setBootModeOptions() {
 	bootModeOptions.enabled = options["enabled"].as<bool>();
 	bootModeOptions.webConfigPinMask = options["webConfigPinMask"].as<int32_t>();
 	bootModeOptions.usbModePinMask = options["usbModePinMask"].as<int32_t>();
-	bootModeOptions.miniGamePinMask = options["miniGamePinMask"].as<int32_t>();
 
     JsonArray mappings = options["inputModeMappings"];
 
@@ -1252,7 +1251,7 @@ std::string setBootModeOptions() {
 std::string getMiniGameOptions() {
 	const size_t capacity = JSON_OBJECT_SIZE(12) + JSON_ARRAY_SIZE(8) + (JSON_OBJECT_SIZE(4) * 8);
 	DynamicJsonDocument doc(capacity);
-	MiniGameOptions& options = Storage::getInstance().getMiniGameOptions();
+	MiniGameOptions& options = Storage::getInstance().getAddonOptions().miniGameOptions;
 
 	writeDoc(doc, "enabled", options.enabled);
 	writeDoc(doc, "defaultGameId", options.defaultGameId);
@@ -1269,7 +1268,7 @@ std::string getMiniGameOptions() {
 		game["gameId"] = options.games[i].gameId;
 		game["enabled"] = options.games[i].enabled;
 		game["order"] = options.games[i].order;
-		game["name"] = options.games[i].gameId == 1 ? "Rhythm Rush" : "Unknown";
+		game["name"] = options.games[i].gameId == MINI_GAME_RHYTHM_ID ? MINI_GAME_RHYTHM_TITLE : "Unknown";
 	}
 
 	return serialize_json(doc);
@@ -1278,7 +1277,7 @@ std::string getMiniGameOptions() {
 std::string setMiniGameOptions() {
 	DynamicJsonDocument doc = get_post_data();
 	JsonObject request = doc.as<JsonObject>();
-	MiniGameOptions& options = Storage::getInstance().getMiniGameOptions();
+	MiniGameOptions& options = Storage::getInstance().getAddonOptions().miniGameOptions;
 
 	options.enabled = request["enabled"].as<bool>();
 	options.defaultGameId = request["defaultGameId"].as<uint32_t>();
@@ -1308,6 +1307,21 @@ std::string setMiniGameOptions() {
 		}
 	}
 	options.games_count = i;
+	bool defaultGameEnabled = false;
+	for (size_t gameIndex = 0; gameIndex < options.games_count; gameIndex++) {
+		if (options.games[gameIndex].enabled && options.games[gameIndex].gameId == options.defaultGameId) {
+			defaultGameEnabled = true;
+			break;
+		}
+	}
+	if (!defaultGameEnabled) {
+		for (size_t gameIndex = 0; gameIndex < options.games_count; gameIndex++) {
+			if (options.games[gameIndex].enabled) {
+				options.defaultGameId = options.games[gameIndex].gameId;
+				break;
+			}
+		}
+	}
 
 	EventManager::getInstance().triggerEvent(new GPStorageSaveEvent(true));
 	return getMiniGameOptions();
@@ -2688,7 +2702,6 @@ enum BOOT_MODES {
 	GAMEPAD = 0,
 	WEBCONFIG = 1,
 	BOOTSEL = 2,
-	MINIGAME = 3,
 };
 
 std::string reboot() {
@@ -2701,8 +2714,6 @@ std::string reboot() {
         systemBootMode = System::BootMode::WEBCONFIG;
     } else if (bootMode == BOOT_MODES::BOOTSEL ) {
         systemBootMode = System::BootMode::USB;
-    } else if (bootMode == BOOT_MODES::MINIGAME ) {
-        systemBootMode = System::BootMode::MINIGAME;
     }
     EventManager::getInstance().triggerEvent(new GPRestartEvent((System::BootMode)systemBootMode));
     doc["success"] = true;

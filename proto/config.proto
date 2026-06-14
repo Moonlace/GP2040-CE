@@ -15,7 +15,6 @@ message BootModeOptions {
     optional uint32 webConfigPinMask = 2;
     optional uint32 usbModePinMask = 3;
     repeated InputModeMapping inputModeMappings = 4 [(nanopb).max_count = 8];
-    optional uint32 miniGamePinMask = 5;
 }
 
 message MiniGameEntry {

@@ -106,7 +106,7 @@ echo Run "%~nx0 full %BOARD%" first.
 goto failed
 
 :missing_output
-echo Build completed, but no UF2 matching board "%BOARD%" was found under "%REPO_ROOT%\build".
+echo Build completed, but no UF2 matching board "%BOARD%" was found under "%CD%\build".
 goto failed
 
 :failed

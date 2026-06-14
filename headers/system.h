@@ -22,7 +22,6 @@ namespace System {
         GAMEPAD = 0x43d566cd,
         WEBCONFIG = 0xe77784a5,
         USB = 0xf737e4e1,
-        MINIGAME = 0x6d696e69,
     };
 
     // Reboots the device and places the supplied BootMode value in a watchdog scratch register
@@ -30,13 +29,6 @@ namespace System {
     void reboot(BootMode bootMode);
     // Retrieves the BootMode value from the watchdog scratch register and resets its value to BootMode::DEFAULT
     BootMode takeBootMode();
-
-    void setMiniGameMode(bool enabled);
-    bool isMiniGameMode();
-    void setMiniGameDisplayReady(bool ready);
-    bool isMiniGameDisplayReady();
-    void requestMiniGameExit();
-    bool takeMiniGameExitRequest();
 }
 
 #endif

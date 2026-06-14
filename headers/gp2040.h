@@ -49,7 +49,6 @@ private:
 
     enum class BootActionType {
 			ENTER_USB_MODE,
-            ENTER_MINIGAME_MODE,
 			SET_INPUT_MODE
 		};
 
@@ -57,7 +56,6 @@ private:
 			BootActionType type;
 			InputMode inputMode;
 			uint32_t profileNumber;
-			bool matched;
 		};
 
 		BootAction getGpioMappedBootAction();

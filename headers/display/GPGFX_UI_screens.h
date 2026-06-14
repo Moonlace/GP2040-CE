@@ -9,9 +9,9 @@ enum DisplayMode {
     DISPLAY_SAVER,
     STATS,
     MAIN_MENU,
-    MINI_GAMES,
     RESTART,
-    SYSTEM_ERROR
+    SYSTEM_ERROR,
+    MINI_GAMES
 };
 
 #include "ui/screens/ButtonLayoutScreen.h"

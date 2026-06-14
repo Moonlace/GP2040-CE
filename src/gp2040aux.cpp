@@ -5,12 +5,10 @@
 #include "drivermanager.h"
 #include "storagemanager.h"
 #include "usbhostmanager.h"
-#include "system.h"
 
 #include "addons/board_led.h"  // Add-Ons
 #include "addons/buzzerspeaker.h"
 #include "addons/display.h"
-#include "addons/mini_game.h"
 #include "addons/pleds.h"
 #include "addons/neopicoleds.h"
 #include "addons/reactiveleds.h"
@@ -27,12 +25,6 @@ GP2040Aux::~GP2040Aux() {
 // GP2040Aux will always come after GP2040 setup(), so we can rely on the
 // GP2040 setup function for certain setup functions.
 void GP2040Aux::setup() {
-	if (System::isMiniGameMode()) {
-		addons.LoadAddon(new MiniGameAddon());
-		isReady = true;
-		return;
-	}
-
 	// Initialize our input driver's auxilliary functions
 	inputDriver = DriverManager::getInstance().getDriver();
 	if ( inputDriver != nullptr ) {

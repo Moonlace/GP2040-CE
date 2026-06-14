@@ -65,5 +65,5 @@ levels, and both display heights:
 ```
 
 This simulator tests game behavior and rendering calls. Real hardware is still
-required for dual-core startup, GPIO boot selection, physical OLED drivers,
-flash persistence, and USB behavior.
+required for the physical OLED driver, flash persistence, USB behavior, and
+navigation between the Web Config display screens.

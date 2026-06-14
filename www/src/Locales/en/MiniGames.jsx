@@ -1,8 +1,8 @@
 export default {
 	title: 'Mini Games',
 	description:
-		'Choose which built-in games appear in the device launcher. Configure the boot button combination on the Boot Mode Configuration page.',
-	'enabled-label': 'Enable Mini Game Add-on',
+		'Choose which built-in games appear on the controller display while it is in Web Config mode.',
+	'enabled-label': 'Enable Mini Games',
 	'games-label': 'Installed Games',
 	'default-game-label': 'Initially Selected Game',
 	'rhythm-settings-label': 'Rhythm Rush Settings',

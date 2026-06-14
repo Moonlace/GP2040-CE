@@ -69,13 +69,9 @@ void GP2040::setup() {
 	Storage::getInstance().SetProcessedGamepad(processedGamepad);
 
 	BootModeOptions& bootModeOptions = Storage::getInstance().getBootModeOptions();
+	BootAction bootAction;
+
 	GamepadOptions& gamepadOptions = Storage::getInstance().getGamepadOptions();
-	BootAction bootAction = {
-		BootActionType::SET_INPUT_MODE,
-		gamepadOptions.inputMode,
-		gamepadOptions.profileNumber,
-		false
-	};
 	uint32_t prevProfile = gamepadOptions.profileNumber;
 	bool profileChanged = false;
 
@@ -131,7 +127,7 @@ void GP2040::setup() {
 	// used to make sure the same gamepad and add-on initialization steps still happen;
 	BootAction altBootAction = getButtonMappedBootAction();
 
-	if (!bootModeOptions.enabled || !bootAction.matched) {
+	if (!bootModeOptions.enabled) {
 		bootAction = altBootAction;
 	}
 
@@ -143,15 +139,11 @@ void GP2040::setup() {
 		return;
 	}
 
-	System::setMiniGameMode(bootAction.type == BootActionType::ENTER_MINIGAME_MODE);
-
 	InputMode inputMode = bootAction.inputMode;
 	uint32_t profile = bootAction.profileNumber;
 
 	// Setup USB Driver
-	if (!System::isMiniGameMode()) {
-		DriverManager::getInstance().setup(inputMode);
-	}
+	DriverManager::getInstance().setup(inputMode);
 
 	if (inputMode != INPUT_MODE_CONFIG) {
 		bool inputModeChanged = inputMode != gamepadOptions.inputMode;
@@ -241,22 +233,19 @@ void GP2040::debounceGpioGetAll() {
 
 void GP2040::run() {
 	bool configMode = DriverManager::getInstance().isConfigMode();
-	bool miniGameMode = System::isMiniGameMode();
 	GPDriver * inputDriver = DriverManager::getInstance().getDriver();
 	Gamepad * gamepad = Storage::getInstance().GetGamepad();
 	Gamepad * processedGamepad = Storage::getInstance().GetProcessedGamepad();
 	GamepadState prevState;
 
-	if (!miniGameMode) {
-		// Start the TinyUSB Device functionality
-		tud_init(TUD_OPT_RHPORT);
+	// Start the TinyUSB Device functionality
+	tud_init(TUD_OPT_RHPORT);
 
-		// Initialize our USB manager
-		USBHostManager::getInstance().start();
+	// Initialize our USB manager
+	USBHostManager::getInstance().start();
 
-		if (configMode == true ) {
-			rndis_init(WEB_CONFIG_HOSTNAME);
-		}
+	if (configMode == true ) {
+		rndis_init(WEB_CONFIG_HOSTNAME);
 	}
 
 	while (1) { // LOOP
@@ -270,16 +259,6 @@ void GP2040::run() {
 		gamepad->read();
 
 		checkRawState(prevState, gamepad->state);
-
-		if (miniGameMode) {
-			gamepad->process();
-			memcpy(&processedGamepad->state, &gamepad->state, sizeof(GamepadState));
-
-			if (!System::isMiniGameDisplayReady() || System::takeMiniGameExitRequest()) {
-				System::reboot(System::BootMode::GAMEPAD);
-			}
-			continue;
-		}
 
 		// Process USB Host on Core0
 		USBHostManager::getInstance().process();
@@ -365,25 +344,17 @@ GP2040::BootAction GP2040::getButtonMappedBootAction() {
 	BootAction bootAction = {
 		BootActionType::SET_INPUT_MODE,
 		gamepadOptions.inputMode,
-		gamepadOptions.profileNumber,
-		false
+		gamepadOptions.profileNumber
 	};
 
 	switch (System::takeBootMode()) {
 		case System::BootMode::GAMEPAD:
-			bootAction.matched = true;
 			return bootAction;
 		case System::BootMode::WEBCONFIG:
 			bootAction.inputMode = InputMode::INPUT_MODE_CONFIG;
-			bootAction.matched = true;
 			return bootAction;
 		case System::BootMode::USB:
 			bootAction.type = BootActionType::ENTER_USB_MODE;
-			bootAction.matched = true;
-			return bootAction;
-		case System::BootMode::MINIGAME:
-			bootAction.type = BootActionType::ENTER_MINIGAME_MODE;
-			bootAction.matched = true;
 			return bootAction;
 		case System::BootMode::DEFAULT:
 			break;
@@ -415,12 +386,10 @@ GP2040::BootAction GP2040::getButtonMappedBootAction() {
 
 	if (gamepad->pressedS1() && gamepad->pressedS2() && gamepad->pressedUp()) {
 		bootAction.type = BootActionType::ENTER_USB_MODE;
-		bootAction.matched = true;
 		return bootAction;
 	}
 	if (!webConfigLocked && gamepad->pressedS2()) {
 		bootAction.inputMode =  InputMode::INPUT_MODE_CONFIG;
-		bootAction.matched = true;
 		return bootAction;
 	}
 	// input mask, action
@@ -439,7 +408,6 @@ GP2040::BootAction GP2040::getButtonMappedBootAction() {
 	if (!modeSwitchLocked) {
 		if (auto search = bootActions.find(gamepad->state.buttons); search != bootActions.end()) {
 			bootAction.inputMode = static_cast<InputMode>(search->second);
-			bootAction.matched = true;
 			return bootAction;
 		}
 	}
@@ -459,28 +427,16 @@ GP2040::BootAction GP2040::getGpioMappedBootAction() {
 	const GamepadOptions& gamepad = Storage::getInstance().getGamepadOptions();
 	const BootModeOptions& bootModeOptions = Storage::getInstance().getBootModeOptions();
 	// Initialized to the current mode and profile
-	BootAction action = {
-		BootActionType::SET_INPUT_MODE,
-		gamepad.inputMode,
-		gamepad.profileNumber,
-		false
-	};
+	BootAction action = { BootActionType::SET_INPUT_MODE, gamepad.inputMode, gamepad.profileNumber };
 
 	switch (System::takeBootMode()) {
 		case System::BootMode::GAMEPAD:
-			action.matched = true;
 			return action;
 		case System::BootMode::WEBCONFIG:
 			action.inputMode = InputMode::INPUT_MODE_CONFIG;
-			action.matched = true;
 			return action;
 		case System::BootMode::USB:
 			action.type = BootActionType::ENTER_USB_MODE;
-			action.matched = true;
-			return action;
-		case System::BootMode::MINIGAME:
-			action.type = BootActionType::ENTER_MINIGAME_MODE;
-			action.matched = true;
 			return action;
 		default:
 			break;
@@ -489,20 +445,11 @@ GP2040::BootAction GP2040::getGpioMappedBootAction() {
 
 	if (gpio == bootModeOptions.usbModePinMask) {
 		action.type = BootActionType::ENTER_USB_MODE;
-		action.matched = true;
 		return action;
 	}
 
 	if (gpio == bootModeOptions.webConfigPinMask) {
 		action.inputMode = InputMode::INPUT_MODE_CONFIG;
-		action.matched = true;
-		return action;
-	}
-
-	if (bootModeOptions.miniGamePinMask != static_cast<uint32_t>(-1) &&
-		gpio == bootModeOptions.miniGamePinMask) {
-		action.type = BootActionType::ENTER_MINIGAME_MODE;
-		action.matched = true;
 		return action;
 	}
 
@@ -515,7 +462,6 @@ GP2040::BootAction GP2040::getGpioMappedBootAction() {
 			if (m.profileNumber > 0) {
 				action.profileNumber = m.profileNumber;
 			}
-			action.matched = true;
 			break;
 		}
 	}

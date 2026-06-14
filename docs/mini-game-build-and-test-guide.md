@@ -180,6 +180,11 @@ the add-on and desired games, configure the four Rhythm Rush lane buttons, selec
 the boot-entry button, save, and reboot. Hold that configured boot button while
 powering on or rebooting to let the mini-game add-on take ownership of the display.
 
+If a configured GPIO boot combination does not match, holding `S2` while connecting
+USB remains a fallback for entering Web Configurator mode. From normal controller
+mode, release all buttons briefly and then hold `S2 + B3 + B4` for four seconds to
+reboot into Web Configurator mode.
+
 ### Initialize dependencies
 
 ```powershell

@@ -57,6 +57,7 @@ private:
 			BootActionType type;
 			InputMode inputMode;
 			uint32_t profileNumber;
+			bool matched;
 		};
 
 		BootAction getGpioMappedBootAction();

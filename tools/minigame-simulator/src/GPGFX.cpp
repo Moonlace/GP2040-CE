@@ -87,42 +87,28 @@ void GPGFX::drawLine(
 void GPGFX::drawRectangle(
 	uint16_t x,
 	uint16_t y,
-	uint16_t rectangleWidth,
-	uint16_t rectangleHeight,
+	uint16_t right,
+	uint16_t bottom,
 	uint32_t color,
 	uint8_t filled,
 	double rotationAngle
 ) {
 	(void)rotationAngle;
-	if (rectangleWidth == 0 || rectangleHeight == 0) {
+	if (right < x || bottom < y) {
 		return;
 	}
 
 	if (filled) {
-		for (uint16_t row = 0; row < rectangleHeight; row++) {
-			drawLine(x, y + row, x + rectangleWidth - 1, y + row, color, 0);
+		for (uint16_t row = y; row <= bottom; row++) {
+			drawLine(x, row, right, row, color, 0);
 		}
 		return;
 	}
 
-	drawLine(x, y, x + rectangleWidth - 1, y, color, 0);
-	drawLine(x, y, x, y + rectangleHeight - 1, color, 0);
-	drawLine(
-		x + rectangleWidth - 1,
-		y,
-		x + rectangleWidth - 1,
-		y + rectangleHeight - 1,
-		color,
-		0
-	);
-	drawLine(
-		x,
-		y + rectangleHeight - 1,
-		x + rectangleWidth - 1,
-		y + rectangleHeight - 1,
-		color,
-		0
-	);
+	drawLine(x, y, right, y, color, 0);
+	drawLine(x, y, x, bottom, color, 0);
+	drawLine(right, y, right, bottom, color, 0);
+	drawLine(x, bottom, right, bottom, color, 0);
 }
 
 void GPGFX::present(std::ostream& output) const {

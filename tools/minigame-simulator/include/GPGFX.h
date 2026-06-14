@@ -31,8 +31,8 @@ public:
 	void drawRectangle(
 		uint16_t x,
 		uint16_t y,
-		uint16_t width,
-		uint16_t height,
+		uint16_t right,
+		uint16_t bottom,
 		uint32_t color,
 		uint8_t filled,
 		double rotationAngle = 0

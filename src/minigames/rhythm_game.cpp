@@ -155,6 +155,13 @@ void RhythmGame::render(GPGFX& display) {
             y = displayHeight - 4;
         }
         const uint16_t x = note.lane * laneWidth + 4;
-        display.drawRectangle(x, static_cast<uint16_t>(y), noteWidth, 4, 1, 1);
+        display.drawRectangle(
+            x,
+            static_cast<uint16_t>(y),
+            x + noteWidth - 1,
+            static_cast<uint16_t>(y) + 3,
+            1,
+            1
+        );
     }
 }
